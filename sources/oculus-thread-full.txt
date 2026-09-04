@@ -1,0 +1,303 @@
+UE4 Sun Temple MOD - VR Navigation Experiments
+forums.oculus.com thread f=32&t=18422 (dead link)
+Recovered via Wayback Machine snapshot 2015-04-19
+
+=== POST #p229915 ===
+Author: PatimPatam
+Date/meta: Mon Dec 22, 2014 10:32 am
+
+.
+Hello there! I like to write a little too much sometimes, so if you don't have time for reading.. just
+TRY THIS!
+http://www.mediafire.com/download/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip
+Ok maybe check the "README.txt" first for controls.
+The demo can still be enjoyed even if you don't want to try my alternative navigation methods or don't have a Razer Hydra (just use gamepad thumbsticks).
+INTRO
+So apart from my particular obsession with positional tracking and motion controls another thing that i've been very interested in lately is THE VR NAVIGATION PROBLEM.
+I believe letting people navigate VR environments intuitively, without inducing sickness to a significant percentage of them, is going to be crucial for the mainstream success of VR.
+Unfortunately i think we are not quite there yet.
+SIMULATION SICKNESS
+Even if we get the perfect HMD with ultra-accurate tracking, high refresh rate and 0 latency, simulating the usual game avatar walking or turning by using a gamepad or a mouse will still induce sickness to many people, because of the simple fact that there's still a mismatch between their visual and vestibular system.
+Basically a HMD with a wide FOV can create the illusion of self-motion (vection) while your inner ear is not really detecting any movement, and this creates a conflict. Acceleration is the main problem here not velocity, since constant velocity doesn't really affect our inner ear fluids.
+We know one possible solution is to design experiences where your avatar is not moving or is staying inside a fixed reference point like a cockpit, but i think this new alternate reality begs to be explored without restrictions.
+NAVIGATION USABILITY
+Another aspect that i think needs to be improved a lot is navigation usability. It would be ideal if we had a navigation system that could be used even by non-technical people or with no previous gaming experience. Grandmas should be able to enjoy VR in all its glory!
+Personally i don't think traditional controller thumbsticks have a place in the future of VR navigation. Yes they served their purpose in the history of computer games; when Microsoft released Halo in 2001 it was great being able to play a FPS while sitting on your couch, but really, i think having only 2DOF (for each thumbstick) with very limited granularity and precision is far from ideal for VR navigation.
+13 years later we still don't know what the "standard" VR controller is going to look like, but we do know that it's very likely going to involve having 6DOF tracking on each hand (on top of 6DOF tracking for the head). We already have great products that meet these requirements (Oculus DK2 and Razer Hydra), i think it's time to try something different.. So DEATH TO THE THUMBSTICK!! Oh and DEATH TO THE MOUSE TOO!! There!
+A BIT OF HISTORY
+There have already been a good number of efforts trying to solve some of these Navigation issues, but as far as i know all of them have some sort of tradeoff.
+-
+Time Rifters
+seems to make a really good job reducing sim-sickness by having the HUD in a fixed position, giving the user the feeling of being inside a helmet and creating the same effect as cockpit games (where having a reference point reduces vection).
+- The guys at
+CloudHead Games
+introduced what they called "
+Comfort Mode
+" for their game "The Gallery" which effectively removed rotational vection by creating incremental steps (of around 30 degrees i believe). This seems to help a lot of people, but many find it quite immersion breaking.
+-
+AltspaceVR
+introduced an instant-teleport mode which similarly to comfort-mode completely eliminates vection, but in this case for translations instead of rotations. I think it's a really clever system and can be useful in many circumstances, but obviously it feels very different to what most people are used to. I think using it for instance in a game like Skyrim would remove some of the "magic" of exploration.
+- I think the developer of
+Lava inc
+had a good idea using positional tracking to control the forward acceleration, but unfortunately the sharp turns of the rollercoaster combined with a small wagon with no fixed reference made it a bit sim-sickness inducing, at least for me.
+-
+EvilMech Runner
+and
+AngryBots
+(not sure which one was first) implemented quite an original method of navigation also with the help of positional tracking, by detecting the up and down motion of the HMD when walking in place in RL and translating it into forward movement in VR. Some people said that it really helps, but it can lack the control finesse of other methods and be a bit too "active" for some users.
+-
+Windlands
+is reported to be rather comfortable by quite a few people, i think this is due to the mechanic of turning your head before moving and then going quickly forward. Also the open-landscape nature of the level helps to reduce the amount of vection.
+- There are probably a few more examples worth noting that i don't remember right now, but i'll finish with a quote from
+Palmer Luckey
+who said after Oculus Connect regarding the vestibular mismatch:
+We have tested countless ideas (locked backgrounds, grids, FOV reduction, blur, head-movement based navigation, etc), but as of yet, there is no universal solution. Everything promising is very situationally dependent, not a silver bullet.
+I'm disappointed that our extensive research has not turned up a universal fix for vection, but it is not for lack of trying.
+Personally i have been thinking about and discussing this issue in a few different places over the last couple years, here are some examples of interesting threads worth a read:
+http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&t=18694
+https://forums.oculus.com/viewtopic.php?f=37&t=7987
+MOTION-BASED NAVIGATION (MBN)
+So i decided that i wanted to build a little demo to test some of the navigation methods that seemed more promising to me.
+In fact i started by testing some of these methods by modifying the Tuscany demo almost a year ago, but soon i realized that in order to understand if something "felt" right it was essential to have a body inside the game, a more or less decent avatar that you could identify with. So that would take a bit more work than just a quick hack.
+Apart from that i also wanted to have an alternative demo to Tuscany to show VR locomotion to first timers, so i decided to do both things at the same time while learning UE4, and i based my work on the already great
+UE4 SUN TEMPLE demo
+(more about this later).
+I finally have something to show, and after trying a few different things that didn't work out i eventually settled for 1 alternative system for controlling avatar movement (translation) and 3 alternatives for controlling avatar rotation (1 using motion controls and 2 using head-tracking).
+Basically i was inspired by the "1 button thread" in MTBS i mentioned before and i implemented what i named "PositionalMove" + "MotionTurn" on the oculus forum discussion, as well as 2 variations of "HeadStick + TurnButton".
+The main idea is to use only 1 or 2 buttons in combination with other inputs in order to move or turn. The trick is that the buttons only "activate" navigation mode, but to control it you have to use your torso and/or hands. This means that if you want to stop moving or turning you have to return to the original position; this way there is always a smooth and directly controlled motion, without sudden accelerations or decelerations.
+Head-Based Translation
+The basic idea for translation is to lean in Real-Life (RL) in the same direction that you want to move in Virtual Reality (VR). The theory is that this helps to reduce the mismatch between acceleration in VR and being idle in RL; we find a middle ground by mimicking the motions we want to do in VR.
+Let me define some terms first:
+S = Stopped
+V = Velocity
+A = Acceleration
+D = Deceleration
+J = Jerk
+↑ = Increase
+↓ = Decrease
+Here's an example of the correspondence between leaning forward in RL and moving the character forward in VR:
+Code:
+Select all
+RL   -->  VR
+S     -->  S        Head/torso is stopped in RL / Avatar stopped in VR
+V↑(A) -->  A↑(Ja)   We start moving (accelerating) head forward / Acceleration increase in VR
+V     -->  A        We continue to move head at constant velocity / Constant acceleration in VR
+v↓(D) -->  A↓(Jd)   We start stopping (decelerating) head motion / Acceleration decrease in VR
+S     -->  V        Head stopped in forward position / Constant velocity in VR
+So what we are actually doing here is applying in VR the time derivative of the action applied in RL. There is still a mismatch between both, but this mismatch is not so obvious to the brain anymore since there is a correlation between accelerations.
+The implementation sounds quite simple but i had a few challenges, like how to compensate for rotation of the head when you are only interested in translation of your torso (so it's possible to turn your head without moving). Since the SDK simply provides the location of the HMD you have to subtract the changes in translation caused by the rotation of your head to the "Device Position". My solution is not perfect since you have to approximate using a factor that depends on the size of the head, but it's still much better than using no correction at all.
+Head-Based Rotation (Standard)
+A similar principle applies when using head-based rotations. Here the rotation of your head in RL affects the rotation of your avatar in VR, however it has some problems that we didn't have with head-based translations.
+I think it works quite well when mainly walking forward and making adjustments to your walking direction, but it's a bit counter-intuitive when for instance you are standing still, you notice something on your side and you want to rotate towards it. In real life you would always keep staring at the object while you are rotating, but here you have to effectively look away in order to be able to turn and then face it again.
+I still left it because maybe some people prefer it over using a thumbstick or find it less nausea-inducing than other options.
+Head-Based Rotation (Direct)
+Alternative to the Standard version, here you immediately turn towards the point that you are looking at, so you have to counter the rotation with your head.
+I think it works pretty well because all you have to do is fix your view in the direction that you want to go, and naturally compensate for the avatar rotation until it stops. The problem is that it doesn't follow the correlation between accelerations explained before, so i think it can induce motion sickness more easily; still i believe it could be a decent alternative in absence of motion controls.
+Hand-Based Rotation
+This is the last method that i implemented for rotation. Basically you hold a motion controller like the Razer Hydra and use the yaw value of the control in combination with a button press to determine the rotation of the avatar in VR.
+It's really quite similar to using a thumbstick but with the difference that it's much more precise, so you have greater control of the movement and it can provide much smoother transitions. This i believe can help reducing sim-sickness too.
+1-Button Mode
+Finally i also implemented what i call 1-Button Mode. If you activate this mode then the same buttons used for rotation will activate head-based translation as well. I think it works especially well with hand-based rotation (Hydras).
+Control Methods Conclusions
+All methods of input are enabled at the same time (using different buttons explained on the readme) so you can try different combinations, thumbstick to move and HandBased Rotation to rotate, play with the sensitivity adjustments, etc. You can also try stepping in front instead of leaning, but personally prefer to stay in place.
+For me the best combination by far is
+Head-Based Translation + Hand-Based Rotation
+, but i left the other options so people could test them. I'm quite certain i will settle for this or a very similar control scheme in the game that i'm working on, but would be honored if other games or apps considered it.
+PROS
+- Intuitive and easy to learn
+- It can attenuate simulation sickness
+- Responsive, precise and smooth (considerably more than using wasd keys or gamepad thumbsticks)
+- Simplifies hand controls (from 2 thumbsticks to only 1 or 2 buttons), freedom to do other things, ideal in combination with motion controls, motion capture cameras or even pedals
+- Decoupling of movement and vision -> allows richer interactions
+- Works both standing and seated
+CONS
+- Can't turn and do something that involves rotating both hands at the same time
+- Requires HMD positional tracking and motion controls so not applicable to something like GearVR. Having said that since only rotational tracking of the hands is required i guess something like the DroidGlove could be used instead of the Hydra/Stem/Move:
+http://cubic9.com/Devel/OculusRift/DroidGlove_en/
+- Might be a bit biased, but i can't think of any other one right now
+RESULTS
+Personally i don't usually get motion sickness so i'm not the best test subject. I tested with only 3 people apart from me and no sim-sickness reported using hydra motion-controls, one of them experienced a bit of dizziness using standard thumbsticks.
+The only discomfort that was mentioned by one of the users (my brother) was when crashing into a wall, so i would advise please try not to crash into walls when testing, this will create a mismatch. Maybe it could be sold as a feature to increase immersion: you wouldn't crash your head against a wall in Real-Life, don't do it in VR either!
+Unfortunately i don't think i can say that i "solved" the vestibular mismatch issue
+, in the end my approach has its own set of tradeoffs like the other methods, but i thought i was worth the effort exploring.
+At least it's another option on the list which some people might prefer
+, which i believe is a good thing.
+ABOUT THE SUN TEMPLE MAP
+Like i mentioned before, i wanted an alternative to Tuscany as an intro to VR and as a possible standing experience with movement. The main problems i found with Tuscany are:
+- No avatar body
+- Center of rotation when turning seems off
+- Fairly simple graphics
+- Stairs, which can induce sim-sickness
+- Strange bumps on the floor
+So i adapted/modded the UE4 SUN TEMPLE map for VR using the VR Template provided by mitchemmc from the Epic forums. I think it's an awesome map, looks good and runs quite well since it was originally optimized for mobile hardware. Another advantage is that it's quite small with close walls and columns so it has a good amount of vection.
+The only problem with it is that it has 2 different levels and stairs in between, which is not good since this can induce sim-sickness too. I wanted to remove this problem from the equation so i decided to remove the stairs and flatten out the whole map; unfortunately the first hallway was a bit too much work to put at the same level as the rest so it's not accessible at the moment.
+Here are some of the changes i made to the original level:
+- Flattened map (minus hallway)
+- Removed a few things for performance
+- Changed scale / location of some objects that didn't look quite right in VR
+- Adapted lighting / post-process
+- Revised collisions
+- Added ambient sounds
+- Added avatar from VR template, slightly tweaked (i know animations could be improved a lot)
+So basically i butchered the whole map, apologies to the original designers at Epic!
+PERFORMANCE AND OTHER CONSIDERATIONS
+The demo is compatible with
+0.4.2 -> 0.4.4 Oculus runtimes
+, although i don't really recommend 0.4.3.
+The best performance for me is with
+0.4.2 Direct Mode / Mirroring OFF / AERO OFF
+(hmd sp 140).
+I think it's VERY IMPORTANT to tweak the
+Screen Percentage
+value as best as you can for your machine. It has a big impact in visual fidelity so it should always be the maximum possible that allows you to run at constant 75 fps. You can access it in the menu (start button to enter menu and right trigger to select).
+By default it's 130. If the demo is not running at constant 75 fps try to turn it down until it does. If the demo is running at constant 75 fps try to turn it up until it doesn't and then turn it back down again.
+As always there is a tradeoff, 0.4.4 has awesome
+near-0 low latency
+but in my case i have to turn down the screen percentage too low for my taste (110), that's why personally i prefer 0.4.2
+If using
+0.4.4 Direct Mode -> Turn Aero ON!
+Remember to leave
+Razer Hydra on the base
+until the demo has started!
+I recommend
+playing standing in place
+to get a better sense of immersion/presence.
+Try to
+avoid crashing into walls
+or anything that will suddently stop your avatar as this can easily induce sim-sickness.
+Ambient Sound:
+I did a very quick job with this so i recommend to play it at very
+low volume
+(so you can barely hear your own steps) and without headphones (as it will only help you notice that there is no proper audio spatialization).
+TO FINISH OFF
+Please help testing this! I appreciate honest feedback and i'm especially interested in people that experience problems with vection (discomfort moving around in the Tuscany demo for instance).
+Let me know what you think!
+Which was your favorite mode or combination? Did you notice improvement in sim-sickness or was it worse than with classic navigation methods? Did you find the new controls intuitive?
+Cheers!
+Special Thanks to skyrimer (MTBS forums), MrGreen (Oculus forums), mitchemmc (UE4 VR Game Template) and getnamo (UE4 Control Plugins).
+https://forums.unrealengine.com/showthread.php?12874-VR-Game-Template
+https://forums.unrealengine.com/showthread.php?3505-Razer-Hydra-Plugin
+EDIT 12-30-2014:
+Some minor corrections to improve clarity
+
+
+=== POST #p230018 ===
+Author: cybereality
+Date/meta: Mon Dec 22, 2014 3:24 pm
+
+Wow dude!
+
+
+=== POST #p230367 ===
+Author: vrcover
+Date/meta: Tue Dec 23, 2014 7:28 pm
+
+Impressive writeup and experiment. Thanks for sharing this. My Oculus broke and I wait for my new one but will test this asap.
+
+
+=== POST #p230470 ===
+Author: spyro
+Date/meta: Wed Dec 24, 2014 6:29 am
+
+Extremely interesting!! I will test this as soon as I can (I hope this works with a normal 360 controller, too).
+
+
+=== POST #p230548 ===
+Author: inutile
+Date/meta: Wed Dec 24, 2014 2:20 pm
+
+Gave this a try after seeing your post in the other thread (
+viewtopic.php?f=26&t=17894
+).
+I used a 360 controller because I do not own a Hydra setup. I found that turning using head movements was fairly comfortable, much more so than the traditional "right stick or mouse" method. However, I still preferred using the left stick for movement as moving my head forward felt odd to me (this could probably be alleviated by spending more time using this control method).
+The head movement for turning plus stick for movement setup felt pretty good overall to me. I think some sort of HUD element to show how far "off center" your head is in either direction would make it feel even better.
+Pretty interesting, nice work!
+
+
+=== POST #p230706 ===
+Author: PatimPatam
+Date/meta: Thu Dec 25, 2014 2:04 pm
+
+@inutile Thanks for the comments and suggestions!
+For Head-Based Translation i recommend leaning your whole upper-body, not trying to move your head forward; playing standing makes it a bit easier as well.
+Also try tweaking the sensitivity by using the "Home" and "End" keys.
+
+
+=== POST #p230707 ===
+Author: PatimPatam
+Date/meta: Thu Dec 25, 2014 2:17 pm
+
+Ok here's the LINK to the Reddit discussion, for future reference:
+http://www.reddit.com/r/oculus/comments/2q9xmk/my_experiments_to_reduce_motion_sickness_ue4_sun/
+So far not too many reviews, but happy to hear there's a few people that agree
+Head-Based Translation
+is a good method for locomotion, and at least a couple that find
+Head-Based Rotation
+both more intuitive and less sickness inducing than using thumbsticks. I guess i'm not completely bonkers
+Especially interested to hear the opinion about
+Hand-Based Rotation
+from people who have Razer Hydras.
+Thanks again for the replies, more comments are welcome!
+
+
+=== POST #p233447 ===
+Author: PatimPatam
+Date/meta: Mon Jan 05, 2015 8:54 am
+
+Well i have tested this with a few more people.. In general most like the idea of
+leaning to move (Head-Based Translation)
+, although there are still some small issues, like sometimes moving backwards when looking up for example. As i explained in the main post the problem is that i'm trying to figure out the position of the base of the neck / torso based on the position of the HMD, unfortunately this depends on the size of the head. This could be improved by approximating this size based on the user IPD for instance, or by allowing to manually input/tweak this radius.
+Obviously the more correct way to do it would be if we could track directly the position of the torso
+; this could be done with the soon-to-be-released STEM Packs, or with a bit of luck we could have this ability as part of Oculus' final tracking solution for CV1.
+Head-Based Rotation
+seems more of a mixed bag.. Personally i'm not convinced about its current implementation, but i still think something very similar has the potential to work as well as Head-Based Translation, again once we have the means to properly track our torso separately from our head.
+So i believe a good solution could be
+Torso-Based Translation + Torso-Based Rotation
+, with only 1 button to activate movement. Since i do have the Razer Hydras i decided to give this a try and modified the demo to include this option even though it's a bit clunky to set-up; basically you have to attach one of the Hydras near to your chest in a similar way to the Hydra Cover Shooter by Teddy0k.
+First tests of this new setup are extremely encouraging
+; it feels very intuitive, with great freedom of movement and reduced discomfort. Mainly it has the same advantages of Hand-Based Rotation (because it's completely decoupled from head movement), but at the same time it still mitigates sim-sickness because the rotational accelerations are related.
+Once you have the ability to track the torso you could argue that you should just physically rotate 360 degrees (either standing or with a spinning chair), which is a valid option, but i think this method has some advantages:
+- more passive approach, probably better for longer sessions
+- no need for cable management system to allow 360 turning
+- can be used while seated on non-spinning chairs or sofas
+- safer since you don't have to actually move your feet at all
+In short, after giving it a try myself i'm quite convinced that
+Torso-Based Navigation
+is going to be one of the best alternatives for exploring VR environments in the future.
+Soon i will release a new version of the demo including this option, as well as some other improvements. The main issue is that not many people seem to have functioning Hydras to test this, but well at least it will be ready for when people start receiving their STEM Systems!
+
+
+=== POST #p246022 ===
+Author: getnamo
+Date/meta: Tue Feb 17, 2015 5:22 pm
+
+Love the detailed writeup and after trying this recently I have to say you are on to something here. Really great job
+To reiterate what I said on reddit:
+There are a few adjustments I would make, but I think this form of navigation is the perfect balance between an omni and full comfort mode of teleporting/guided walk.
+What works
+-Left hydra lean for walking and stopping. Sidestepping works great!
+-Right hydra lean if you sync it with your torso rotation, ideally this will be based off of a third sensor point attached to your torso in future devices.
+What doesn't
+-Turning when fully stopped, I think comfort turn is the only acceptable way to handle this case. Should only be used when you want to reorient your body, otherwise use your head to look around as usual.
+-Walking doesn't always stop when I feel it should, especially short walking distances need some calibration to feel right IMO. Might change it so that releasing the bumper at low velocities gives you a full stop.
+Will try to tinker with something similar to see if I can't get it to work right with climbing and jumping.
+
+
+=== POST #p246080 ===
+Author: PatimPatam
+Date/meta: Wed Feb 18, 2015 4:52 am
+
+Thanks a lot for your reply getnamo, it is very encouraging. Finally someone who was able to test this using the Razer Hydra and cared to comment, yey!
+I agree with you about finding the right balance, i believe this control method is a good compromise between immersion, comfort and convenience.
+Obviously some people will prefer to lay down on the sofa and not move an inch of their bodies, this group will probably think this is too much hard work. Then some other people will like to walk-in-place and physically turn 360, or even buy ODTs and the like, this group who will probably think this method is not the "real-deal". But i'm ok with that; i know it's impossible to please everyone.
+Regarding your issues:
+The main problem i found with turning when fully stopped is that it's easy to trigger translation involuntarily.. on the new version that i will publish soon i tweaked it a bit, making the amount of rotation proportionally reduce the amount of translation applied, and this seems to work really well.
+I was also aware about the other problem with controlling when to stop, and it was quite easy to fix actually; on the 1st version i was probably a bit too strict with the threshold i set (because i didn't want the user to feel any "jump"), but now i made this stop threshold a bit higher by default and also configurable.
+If you are interested i can send you some of my blueprints, a few of them are a bit trickier than you might think initially
+
+
+=== POST #p248290 ===
+Author: saviornt
+Date/meta: Wed Feb 25, 2015 3:27 pm
+
+I'll give this a try when I get home today.. ended up getting a high priority ticket just as I was getting off of work >.<
