@@ -34,7 +34,10 @@ img{max-width:100%;height:auto}
 .pdetails dd{margin:0}
 .post-main{flex:1;min-width:0;padding:14px 18px}
 .post-meta{display:flex;justify-content:space-between;color:var(--dim);font-size:.8rem;border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:10px}
+.post-body{overflow-wrap:break-word}
 .post-body p{margin:.6em 0}
+.post-body ul,.post-body ol{margin:.6em 0;padding-left:1.4em}
+.post-body li{margin:.3em 0}
 .post-body blockquote{background:#eef2f6;border-left:3px solid var(--accent);margin:.8em 0;padding:.5em .9em;font-size:.93em}
 .post-body blockquote cite{display:block;font-weight:700;font-size:.8em;color:var(--dim);margin-bottom:.3em;font-style:normal}
 .post-body figure{margin:.8em 0}
@@ -74,7 +77,7 @@ img{max-width:100%;height:auto}
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Jan 08, 2013 1:04 am</span> <a class="panchor" href="#p91936">#p91936</a></div>
     <div class="post-body">
-      <p>WARNING: If you don't want to read quite a lot I suggest you skip directly to the YouTube videos further down!  </p>
+      <p>WARNING: If you don't want to read quite a lot I suggest you skip directly to the YouTube videos further down!   🙂 </p>
 <h4>INTRO</h4>
 <p>First of all I wanted to mention that i designed this solution mainly with the Oculus Rift in mind, but this concept could be applied to most types of HMDs, that's why i put it under the R&amp;D section.</p>
 <p>I think by now everyone in this forum understands the need for true 6DOF positional tracking so i won't go over it again. I will just stress what Mr Abrash from Valve mentioned at Quakecon: parallax is even more important than stereoscopy for VR/AR. Here's an interesting link:<br><a href="http://cb.nowan.net/blog/2010/04/28/does-stereoscopy-s3d-matter" target="_blank" rel="noopener">http://cb.nowan.net/blog/2010/04/28/does-stereoscopy-s3d-matter</a></p>
@@ -89,10 +92,7 @@ img{max-width:100%;height:auto}
 <p>A few months back i was following this very interesting topic on 6 DOF head tracking ideas:<br><a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=120&amp;t=15040" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=120&amp;t=15040</a></p>
 <p>After a few posts on this and some other related threads i was quite surprised to find out that apparently no-one in the forum had tried to implement something similar before or given it much thought.. so i decided to give it a try myself as soon as i found some spare time!</p>
 <p>Basically my main design goals were:</p>
-<pre class="ascii">1- Positional tracking (real 6DOF) with 360 degree horizontal and 90 degree vertical freedom
-2- Maximum one external tracking device (camera), easy to setup, no need for user input or calibration
-3- NOT having "protruding antennas" (TrackIR style) or "external glowing balls" (PS move style).
-    Reason A: they make the HMD more break-prone; Reason B: they don't look very cool</pre>
+<p>1- Positional tracking (real 6DOF) with 360 degree horizontal and 90 degree vertical freedom<br>2- Maximum one external tracking device (camera), easy to setup, no need for user input or calibration<br>3- NOT having "protruding antennas" (TrackIR style) or "external glowing balls" (PS move style).<br>    Reason A: they make the HMD more break-prone; Reason B: they don't look very cool</p>
 <p>I think there's a place for a mid-term solution, something which might not be the definite positional tracking for VR but still better than existing alternatives.</p>
 <hr>
 <h4>THE PROPOSED SOLUTION (proof of concept)</h4>
@@ -134,19 +134,14 @@ TOTAL aprox cost                    -&gt; 43$</pre>
 <p>For the software side i decided to go with C/C++ since having the lowest possible latency is really important. I also decided to use OpenCV for the image analysis side and OpenGL to show some results. I've never used OpenCV before and i found it very good in general, apart from some outdated documentation in places.</p>
 <p>Brief program explanation:</p>
 <p>Initialization:</p>
-<pre class="ascii">    - Create / store 3D model of markers
-    - Apply gaussian blur to the image to prevent false blobs from being detected</pre>
+<ul><li>Create / store 3D model of markers</li><li>Apply gaussian blur to the image to prevent false blobs from being detected</li></ul>
 <p>Core functionality:</p>
-<pre class="ascii">    - Blob analysis: detect ellipses, obtain center coordinates, color and type
-    - Point detection: Match results of blob analysis with 3d model, numbering each marker
-    - Pose estimation: use the matched 3d model points and 2d image points to estimate the pose of the object</pre>
+<ul><li>Blob analysis: detect ellipses, obtain center coordinates, color and type</li><li>Point detection: Match results of blob analysis with 3d model, numbering each marker</li><li>Pose estimation: use the matched 3d model points and 2d image points to estimate the pose of the object</li></ul>
 <p>Show results:</p>
-<pre class="ascii">    - Apply Kalman filter
-    - Paint results of blob analysis and point detection with OpenCV
-    - Paint simple in-game map with OpenGL</pre>
+<ul><li>Apply Kalman filter</li><li>Paint results of blob analysis and point detection with OpenCV</li><li>Paint simple in-game map with OpenGL</li></ul>
 <p>To start off i decided to create my own blob detection algorithm in order to have greater control of the conditions and results. I was pleasantly surprised that my custom scanning patterns proved very reliable detecting up to 5 different colors (r, g, b, w, y) under very different light conditions (complete darkness, artificial light and direct sunlight) and up to 1.5m distance approximately; not as good a distance as i would like but I'm quite confident that this could be improved to 2.5 - 3m without too much difficulty. Still, for now it was good enough to move the main focus to other parts of the problem..</p>
 <p>For the point detection i faced the problem of having to identify 22 different markers having only 5 different colors. In order to do that I created quite a big number of fairly complex rules for each marker, that take into account not only the color of the current marker but the relative position and angles of the adjacent ones from all the possible views. This part can still be improved as sometimes the detection fails, but at this point i realized it would be better to rethink a bit the distribution of the LEDs on the hardware before trying to improve the software side.</p>
-<p>For the pose estimation part i decided to use the OpenCV implementation of the POSIT algorithm. Unfortunately is not as simple as calling a function since the input expects the whole list of points of the object you want to detect, starting always with the same origin point, and for each frame we only have a small subset of these (the points visible by the camera). I managed to get around this by using a few tricks, which i won't go into detail for now </p>
+<p>For the pose estimation part i decided to use the OpenCV implementation of the POSIT algorithm. Unfortunately is not as simple as calling a function since the input expects the whole list of points of the object you want to detect, starting always with the same origin point, and for each frame we only have a small subset of these (the points visible by the camera). I managed to get around this by using a few tricks, which i won't go into detail for now  🙂 </p>
 <p>After we have the position and orientation values I thought it would be cool to show a simple real-time representation of a room, so it's easier to evaluate the quality of the output. To do this i created my own OpenGL "engine", so i could have total control of how the combination of inputs affect the movement "in-game". The map i used is a modified by hand version from one of Nehe's OpenGL tutorials: the result is a funky colored temple, with some kind of "tombstones" inside. Head motion detection is exaggerated on purpose for demonstration, should be toned down when using it with a real HMD.</p>
 <figure class="video"><div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/EzC-HDpv2xw" title="PosiTTron: 6 DOF head-tracking prototype for VR - 01" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></figure>
 <p>Results:</p>
@@ -155,18 +150,10 @@ TOTAL aprox cost                    -&gt; 43$</pre>
 <p>Also most of the jitter you can see (specially with the Kalman filter off) is related to orientation, but this system main purpose is to get positional tracking, so in combination with an IMU for orientation values and leaving the optical tracking to get only the positional information, the final result should be much better. Even though finding orientation was not the main goal of this project, these values are still very usable as you can see on the video.</p>
 <figure class="video"><div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/nsl43qbMnOA" title="PosiTTron: 6 DOF head-tracking prototype for VR - 02" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></figure>
 <p>I don't really know the latency introduced by the PS Eye camera itself but i decided to take some measurements in order to see the latency introduced by my software:</p>
-<pre class="ascii">- normalized box filter blur = 3.38 ms
-- blob analysis = 4.20 ms
-- point detection + pose estimation = 0.06 ms
-- opencv paint results = 0.60 ms
-- opengl paint results = 0.06 ms
-
-TOTAL 8.30 ms aprox</pre>
+<p>- normalized box filter blur = 3.38 ms<br>- blob analysis = 4.20 ms<br>- point detection + pose estimation = 0.06 ms<br>- opencv paint results = 0.60 ms<br>- opengl paint results = 0.06 ms<br>TOTAL 8.30 ms aprox</p>
 <p>First i used OpenCVs Gaussian Blur, but that was taking about 5.20 ms. Later i i realized i could get away replacing it with a Standard Blur (Normalized Box Filter). Blob detection still works great, and latency was reduced by almost 2ms (from 5.20 to 3.38 ms). I believe there's still room for improvement in this area though.</p>
 <p>Recap of current prototype limitations:</p>
-<pre class="ascii">- Blob analysis distance 1.5m. With hardware and software modifications could be improved to 2.5 - 3m
-- Point detections fails sometimes: could be fixed using a different LED distribution
-- 30 fps. 60 fps should be easy to obtain (simply the intensity of LEDs is not properly adjusted). 120 fps possible (at the expense of detection distance due to reduced resolution)</pre>
+<ul><li>Blob analysis distance 1.5m. With hardware and software modifications could be improved to 2.5 - 3m</li><li>Point detections fails sometimes: could be fixed using a different LED distribution</li><li>30 fps. 60 fps should be easy to obtain (simply the intensity of LEDs is not properly adjusted). 120 fps possible (at the expense of detection distance due to reduced resolution)</li></ul>
 <h4>How would a real HMD that uses this system look like?</h4>
 <p>They say a picture is worth a thousand words, so i decided to add a few 3d renders to better show how the idea could be applied to real-life HMDs. Please bear in mind that they are not intended to be very accurate, mechanically correct or even have the right proportions..</p>
 <p>The HMD would have to be separated in 2 different sections, and these could be connected by a telescopic tube for instance, used to maintain rigidness between both parts and to measure the distance between them (in order to feed the tracking algorithm with the exact 3d model). This same information could be useful for other purposes like feeding binaural audio processing with the approximate size of the head.</p>
@@ -176,57 +163,29 @@ TOTAL 8.30 ms aprox</pre>
 <hr>
 <h4>SOME ADDITIONAL THOUGHTS</h4>
 <p>Even though my main priority with this project was seated play, i believe that in combination with a HMD wireless connection and with some improvements on distance detection you could have complete freedom of movement limited to a small area (the FOV of the PS3 camera at a maximum of 3 meters distance approximately). As it is now i think it's good only for seated play, standing/rotating in place could work but you would have to mount the camera on some sort of stand (at head level) and not have much margin to move around.</p>
-<p>As mentioned earlier it's clear that for a consumer device it would be ideal not to have an external tracking device, but i believe having only 1 camera is acceptable, as most people are used to devices like move or Kinect. In fact it could even be seen as a "safety feature": when you walk out of the FOV of the camera the system could pause and warn you. Finally i would like to point out that sometimes we geeks tend to forget that looks is one of the most important aspects for a consumer device. I know as it is now my little prototype doesn't look awesome (and looks are very subjective), but i think it has the potential to look pretty cool. Personally i think it has a Cyclops meets Iron Man kind of vibe </p>
+<p>As mentioned earlier it's clear that for a consumer device it would be ideal not to have an external tracking device, but i believe having only 1 camera is acceptable, as most people are used to devices like move or Kinect. In fact it could even be seen as a "safety feature": when you walk out of the FOV of the camera the system could pause and warn you. Finally i would like to point out that sometimes we geeks tend to forget that looks is one of the most important aspects for a consumer device. I know as it is now my little prototype doesn't look awesome (and looks are very subjective), but i think it has the potential to look pretty cool. Personally i think it has a Cyclops meets Iron Man kind of vibe  🙂 </p>
 <p>General Limitations:</p>
-<pre class="ascii">- The main "problem" of this solution is that the case design of the HMD needs to be adapted to it. I want to make clear that this whole idea is not very practical if you want to add positional tracking to an existing HMD (although everything is possible). It is intended to be part of the shell design for a new HMD built with optical tracking in mind (either DIY or commercial).
-
-- Accuracy degrades with distance, still quite good from 1.5 meters. Could be improved.
-
-- If someone walks between you and the camera while playing you can lose positioning. Again maybe this could actually be turned into a good "feature": If someone occludes the camera for more than 3 seconds it could be a way to communicate they need your attention. It would be good to have a method to do this as someone already suggested before:
-<a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413</a></pre>
+<p>- The main "problem" of this solution is that the case design of the HMD needs to be adapted to it. I want to make clear that this whole idea is not very practical if you want to add positional tracking to an existing HMD (although everything is possible). It is intended to be part of the shell design for a new HMD built with optical tracking in mind (either DIY or commercial).<br>- Accuracy degrades with distance, still quite good from 1.5 meters. Could be improved.<br>- If someone walks between you and the camera while playing you can lose positioning. Again maybe this could actually be turned into a good "feature": If someone occludes the camera for more than 3 seconds it could be a way to communicate they need your attention. It would be good to have a method to do this as someone already suggested before:<br><a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413</a></p>
 <h4>Rift developer kit add-on?</h4>
 <p>Here's a possible idea for a Rift developer kit add-on, or as i like to call it "Rift-Hugger" (inspired by the face-huggers from Alien!). The back part could be used to store standard batteries that would power the LEDs.  My guess is that the front plate of the developer kit can be easily removed with the clips on the side. If not the add-on could be simply attached on top of it. The moving parts on the side that hold the Rift could have some sort of locking mechanism as well.</p>
 <figure><a href="images/12-design-b-rift-hugger.jpg" target="_blank" rel="noopener"><img src="images/12-design-b-rift-hugger.jpg" alt="" loading="lazy"></a></figure>
 <figure><a href="images/13-design-c-rift-and-hugger.jpg" target="_blank" rel="noopener"><img src="images/13-design-c-rift-and-hugger.jpg" alt="" loading="lazy"></a></figure>
 <p>As you can see, as a separate add-on it wouldn't be ideal, it would have to be targeted to a specific HMD model and it wouldn't be easy to DIY, but it could still be done (and very cheaply in fact if mass-produced in a factory).</p>
 <p>Possible next steps / future improvements:</p>
-<pre class="ascii">- Build another improved prototype: modify LED distribution, separate circuits by colors, use potentiometers instead of resistors, etc.
-
-- Leave orientation to nrp's adjacent reality tracker IMU and use optical only for positioning; unfortunately it's not available yet. Reality tracker should be much more accurate and precise for orientation, play with fusion algorithms.
-
-- Adapt prototype to developer Rift size and shape. As i mentioned before the ideal path would be to design the casing with the optical tracking in mind not the other way around, but after seeing the prototype pictures i think we could do something with it. As it is (without adding a rear part) it would not be possible to have the full 360 deg but i reckon i could get about 240 deg lateral tracking (120 rotation to each side), something still very usable in many scenarios, and a nice step up from TrackIR for instance.
-
-- Increase capture distance by software (adjust color thresholds depending on distance between LEDs).
-
-- Improve blob recognition to allow lower resolution input (120 fps mode).
-
-- Use a cheap graphics card (CUDA) or a FPGA to speed up the image processing?
-
-- Track 2 headsets at the same time 1 with camera?
-
-- Extend system for hand tracking?
-
-- Add FreeTrack support / create a plugin for FreePie / create a new VRPN driver?
-  Still have to look into these options and decide which one should i try first..
-  It would be really cool if I could test the prototype with an existing game that supports 6 DOF, like Arma 2 for instance.</pre>
+<p>- Build another improved prototype: modify LED distribution, separate circuits by colors, use potentiometers instead of resistors, etc.<br>- Leave orientation to nrp's adjacent reality tracker IMU and use optical only for positioning; unfortunately it's not available yet. Reality tracker should be much more accurate and precise for orientation, play with fusion algorithms.<br>- Adapt prototype to developer Rift size and shape. As i mentioned before the ideal path would be to design the casing with the optical tracking in mind not the other way around, but after seeing the prototype pictures i think we could do something with it. As it is (without adding a rear part) it would not be possible to have the full 360 deg but i reckon i could get about 240 deg lateral tracking (120 rotation to each side), something still very usable in many scenarios, and a nice step up from TrackIR for instance.<br>- Increase capture distance by software (adjust color thresholds depending on distance between LEDs).<br>- Improve blob recognition to allow lower resolution input (120 fps mode).<br>- Use a cheap graphics card (CUDA) or a FPGA to speed up the image processing?<br>- Track 2 headsets at the same time 1 with camera?<br>- Extend system for hand tracking?<br>- Add FreeTrack support / create a plugin for FreePie / create a new VRPN driver?<br>  Still have to look into these options and decide which one should i try first..<br>  It would be really cool if I could test the prototype with an existing game that supports 6 DOF, like Arma 2 for instance.</p>
 <figure><a href="images/08-prototype-front-lit.jpg" target="_blank" rel="noopener"><img src="images/08-prototype-front-lit.jpg" alt="" loading="lazy"></a></figure>
 <p>About the POSITTRON name:</p>
 <p>I have to say that i'm not really planning to patent it or anything, i put a name just for fun. I think it suits the project quite well, and sounded better than the boring alternative thread title "HMD optical marker integration".</p>
-<p>The POSIT part is quite obvious, as it's a positional tracking system, and i also happen to use the POSIT algorithm to solve the pose estimation problem. On the TRON side, well TRON is like THE original movie about VR (although not very realistic) and they also happen to use helmets with bright LEDs surrounding them, not too different to my design really! Oh, and I quite like the English band Ladytron </p>
+<p>The POSIT part is quite obvious, as it's a positional tracking system, and i also happen to use the POSIT algorithm to solve the pose estimation problem. On the TRON side, well TRON is like THE original movie about VR (although not very realistic) and they also happen to use helmets with bright LEDs surrounding them, not too different to my design really! Oh, and I quite like the English band Ladytron  🙂 </p>
 <hr>
 <h4>TO FINISH OFF (SALES PITCH STUFF)</h4>
 <p>So I know the proposed solution is not the holy grail of tracking, but i believe it's a realistic and ready to go solution that solves some real problems. Let me finish with a list of benefits (box ad style), they are NOT all true with the current prototype version, but could be on a more finalized design:</p>
-<pre class="ascii">- Precise (sub 1mm) positional tracking (6DOF) with 360 degree horizontal and 90 degree vertical freedom of movement. No magnetic interference, no self-occlusion, no drift.
-- Working range from 50cm (in front of a computer) to 3 meters (in front of a TV set/play area). Seated or standing play. Wireless!
-- 120 fps ready, low latency, fast processing (not computationally expensive).
-- Uses open-source software and of-the-shelf available hardware (cheap components).
-- Only one external camera needed which can be placed anywhere in front of the player, no need for calibration.
-- It can look pretty cool, i believe</pre>
+<ul><li>Precise (sub 1mm) positional tracking (6DOF) with 360 degree horizontal and 90 degree vertical freedom of movement. No magnetic interference, no self-occlusion, no drift.</li><li>Working range from 50cm (in front of a computer) to 3 meters (in front of a TV set/play area). Seated or standing play. Wireless!</li><li>120 fps ready, low latency, fast processing (not computationally expensive).</li><li>Uses open-source software and of-the-shelf available hardware (cheap components).</li><li>Only one external camera needed which can be placed anywhere in front of the player, no need for calibration.</li><li>It can look pretty cool, i believe</li></ul>
 <p>Oh and of course in marketing terms, if this was to be added on top of a 9 DOF tracker like the adjacent reality, i guess it could be called a 15 DOF system:<br>3 DOF accelerometer + 3 DOF gyroscope + 3 DOF magnetometer + 3 DOF optical orientation + 3 DOF optical positioning = 15 DOF!</p>
 <p>I have to say that it has been quite a challenge to find the time to implement all this; i had the idea burning in my head since the end of july more or less, but couldn't start working on it until september. Since then, with a full-time job as web developer, i have been able to spend only a few hours a week on this project..</p>
 <p>Anyway it seems like Oculus are looking into using PTAM for localization/positioning, which i think is the right move in the long term; I really hope they can manage a properly robust and low-latency implementation. Still I think something closer to my design could be a simpler and safe alternative / plan B, in case the PTAM research doesn't pan out in time for the consumer Rift. I also think this design fits quite well with Palmer's approach of "doing more with less".</p>
 <p>Personally i believe this solution would be ideal for the developer version that we will get in about 3 months, as it would let developers start programming and experimenting with positional tracking. Also it would help the Oculus team design the SDK with positioning as a main feature, and to receive feedback from the community. Unfortunately it's probably a bit too late for this to happen on the Kickstarter revision.. who knows, maybe there's still time to add a few holes on the Rift shell as part of the fabrication process heheh.</p>
-<p>In any case i think this could still be useful to developers and DIYers as an alternative to strapping a PS Move, a Razer Hydra or a mobile phone on their heads    I'll be more than happy to help if anyone wants to give it a go. Also of course any good ideas are more than welcome, either from the HW or SW side. I'm sure this particular design and tracking software could be greatly improved but i think my little demo is enough to prove that this is an avenue worth exploring.</p>
+<p>In any case i think this could still be useful to developers and DIYers as an alternative to strapping a PS Move, a Razer Hydra or a mobile phone on their heads   🙂   I'll be more than happy to help if anyone wants to give it a go. Also of course any good ideas are more than welcome, either from the HW or SW side. I'm sure this particular design and tracking software could be greatly improved but i think my little demo is enough to prove that this is an avenue worth exploring.</p>
 <p>Ok, finished (for now), and sorry for the long ramblings!</p>
 <h4>Acknowledgedments:</h4>
 <p>I would like to thank some members of this forum like Brantlew and Chriky who kindly answered some of my newbie questions when i got started, and specially Edz who gave some good advice when we were discussing all this back in July/August. Last but not least i would like to thank my lovely girlfriend for her craftsmanship input while building the physical prototype and for her constant support in all my crazy endeavors!</p>
@@ -395,7 +354,7 @@ TOTAL 8.30 ms aprox</pre>
 <p>@Chriky<br>Thank you for the tip, I will try that!</p>
 <p>@ PasticheDonkey<br>Well i think it really depends on the use you want to make of your HMD. My thought was that for the average gamer it would be easier to simply stay in front of a camera than having to mount markers around the room.</p>
 <p>@ Randomoneh<br>Hahah, thanks man but i wouldn’t call myself awesome! I have a master’s degree on computer science, specializing on computer vision and 3d graphics. Unfortunately for circumstances of life I never managed to get into this industry professionally (although i wouldn't mind to!).</p>
-<p>Also I don’t really know much about electronics, I just did a bit of research once I decided to build this prototype.. Actually I had never soldered a single thing before this!  <br>Still, all of it was a very interesting learning experience!</p>
+<p>Also I don’t really know much about electronics, I just did a bit of research once I decided to build this prototype.. Actually I had never soldered a single thing before this!   😛 <br>Still, all of it was a very interesting learning experience!</p>
     </div>
   </div>
 </article>
@@ -933,7 +892,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Mon Jan 28, 2013 7:35 pm</span> <a class="panchor" href="#p95832">#p95832</a></div>
     <div class="post-body">
       <blockquote><cite>PatimPatam wrote:</cite>I'm not sure if that would work very well though, because at the moment the software implementation is very dependant on the hardware / LED distribution.. The problem is that i don't think the hardware would be easy to DIY, even if i gave very specific instructions. So basically i don't know how it could work without having a common consumer product or "shared base"..</blockquote>
-<p>As far as the housing goes, one of the cafe press-style 3D printing websites that have sprung up might be able to get the job done. The end user would still need to be able to source and solder the LEDs, but that's at least a more common skill than fabrication. </p>
+<p>As far as the housing goes, one of the cafe press-style 3D printing websites that have sprung up might be able to get the job done. The end user would still need to be able to source and solder the LEDs, but that's at least a more common skill than fabrication.  🙂 </p>
 <p>PS - Great demo, btw!</p>
     </div>
   </div>
@@ -971,7 +930,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Mon Jan 28, 2013 11:52 pm</span> <a class="panchor" href="#p95912">#p95912</a></div>
     <div class="post-body">
-      <p>Nice work PatimPatam ! I like the elegance of both the working principle and the design. <br>Posittron is a cool futuristic name also, in combination with the LEDs it reminds me of Data's "<a href="http://en.wikipedia.org/wiki/Positronic_brain" target="_blank" rel="noopener">positronic</a>" brain from Star Trek    :</p>
+      <p>Nice work PatimPatam ! I like the elegance of both the working principle and the design. <br>Posittron is a cool futuristic name also, in combination with the LEDs it reminds me of Data's "<a href="http://en.wikipedia.org/wiki/Positronic_brain" target="_blank" rel="noopener">positronic</a>" brain from Star Trek   😆   :</p>
 <figure><a href="images/thread/02-datas-head.jpg" target="_blank" rel="noopener"><img src="images/thread/02-datas-head.jpg" alt="" loading="lazy"></a></figure>
 <figure><a href="images/thread/03-Positronicbrain.jpg" target="_blank" rel="noopener"><img src="images/thread/03-Positronicbrain.jpg" alt="" loading="lazy"></a></figure>
     </div>
@@ -1010,7 +969,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Tue Jan 29, 2013 10:45 am</span> <a class="panchor" href="#p96022">#p96022</a></div>
     <div class="post-body">
       <p>Hahahah good find DrZimmerman!</p>
-<p>I never really made that connection before (at least not consciously). I guess it is a nice fit then! </p>
+<p>I never really made that connection before (at least not consciously). I guess it is a nice fit then!  🙂 </p>
 <p>@virror</p>
 <p>I think you could be right, but still would be much simpler if a company (or Oculus itself) could provide the hardware, as long as it was at a decent price.. that would allow the design to be a bit more sofisticated as well.</p>
     </div>
@@ -1050,7 +1009,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Jan 29, 2013 9:38 pm</span> <a class="panchor" href="#p96249">#p96249</a></div>
     <div class="post-body">
-      <p>I've been keeping my eye on this thread, and my "Great work!" comment is long overdue    Your approach is very slick!</p>
+      <p>I've been keeping my eye on this thread, and my "Great work!" comment is long overdue   🙂   Your approach is very slick!</p>
 <p>As a thought, if you want to make this available to DIYers that are weary of soldering, perhaps these people could leverage the huge availability of various battery powered LED gizmos on the market. For instance, there might be some usable products from websites such as:<br><a href="http://www.raveworx.com/" target="_blank" rel="noopener">http://www.raveworx.com/</a><br><a href="http://www.flashingblinkylights.com/index.php" target="_blank" rel="noopener">http://www.flashingblinkylights.com/index.php</a><br>ebay<br>etc.</p>
 <p>Another option for those adverse to soldering is crimping, or using suitable jumper wires (<a href="http://www.ebay.com/sch/i.html?_trksid=m570.l3201&amp;_nkw=jumper+wires&amp;_sacat=0" target="_blank" rel="noopener">http://www.ebay.com/sch/i.html?_trksid= ... s&amp;_sacat=0</a>) and a little bit of glue. With clear instructions, it should be easy enough for just about anyone.</p>
     </div>
@@ -1074,7 +1033,7 @@ TOTAL 8.30 ms aprox</pre>
 <p>Well I won't know for sure until i receive my Rift developer kit and start messing around with the adjacent tracker and some sensor fusion, but i am quite optimistic on this front. Orientation tracking shouldn't be any worse than it is without adding PosiTTron. Worst case scenario (most likely) translations won't be as smooth as rotations, but still usable. Best case, they will be as good and you won't be able to tell the difference.</p>
 <p>@MSat</p>
 <p>Thanks for the comments!</p>
-<p>Yeah i think no-soldering required would be a big bonus for the project. However it was already hard enough to find the individual LEDs with the right characteristics, viewing angle, brightness, etc and then adjust the precise amount of current that goes though each type of LED for all to work. I have my doubts that we could find a LED gizmo that would fit into the design, but you never know! That gave me an idea though, if the positional tracking thing doesn't quite work, maybe we can still sell it on that raveworx.com website.. with the PosiTTron on your head i'm sure you would be the king of the rave party! (especially useful if you're a bit ugly like me) </p>
+<p>Yeah i think no-soldering required would be a big bonus for the project. However it was already hard enough to find the individual LEDs with the right characteristics, viewing angle, brightness, etc and then adjust the precise amount of current that goes though each type of LED for all to work. I have my doubts that we could find a LED gizmo that would fit into the design, but you never know! That gave me an idea though, if the positional tracking thing doesn't quite work, maybe we can still sell it on that raveworx.com website.. with the PosiTTron on your head i'm sure you would be the king of the rave party! (especially useful if you're a bit ugly like me)  😛 </p>
 <p>But yes, crimping and jumper wires could be a good alternative to soldering!</p>
 <p>Actually since i think i got some positive feedback and general interest in all this, if i go the open-source route maybe i'll ask for a bit of help to any of you DIY pros watching, someone interested in designing and testing the actual final hardware specs. My electronic/mechanical engineering skills are not particularly amazing, and also my GF is starting to get a bit tired of me spending so much time on this project! (and she's got a good point actually). I would still have my hands full with the whole software side, which still needs a lot of polishing..</p>
     </div>
@@ -1095,7 +1054,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Wed Jan 30, 2013 4:46 pm</span> <a class="panchor" href="#p96478">#p96478</a></div>
     <div class="post-body">
       <blockquote><cite>PatimPatam wrote:</cite><br><br>Yeah i think no-soldering required would be a big bonus for the project. However it was already hard enough to find the individual LEDs with the right characteristics, viewing angle, brightness, etc and then adjust the precise amount of current that goes though each type of LED for all to work. I have my doubts that we could find a LED gizmo that would fit into the design, but you never know! That gave me an idea though, if the positional tracking thing doesn't quite work, maybe we can still sell it on that raveworx.com website.. with the PosiTTron on your head i'm sure you would be the king of the rave party! (especially useful if you're a bit ugly like me)</blockquote>
-<p>Yeah, I figured finding appropriate devices would be a bit of a challenge, and maybe near impossible. It's because of that, that I started thinking of other non-soldering options. BTW, I was reluctant to post that rave junk website, but it was one of the first google results. Still, the PosiTTron would definitely be the ULTIMATE RAVE GEAR!   </p>
+<p>Yeah, I figured finding appropriate devices would be a bit of a challenge, and maybe near impossible. It's because of that, that I started thinking of other non-soldering options. BTW, I was reluctant to post that rave junk website, but it was one of the first google results. Still, the PosiTTron would definitely be the ULTIMATE RAVE GEAR!   😂  </p>
 <blockquote><cite>PatimPatam wrote:</cite><br>Actually since i think i got some positive feedback and general interest in all this, if i go the open-source route maybe i'll ask for a bit of help to any of you DIY pros watching, someone interested in designing and testing the actual final hardware specs. My electronic/mechanical engineering skills are not particularly amazing, and also my GF is starting to get a bit tired of me spending so much time on this project! (and she's got a good point actually). I would still have my hands full with the whole software side, which still needs a lot of polishing..</blockquote>
 <p>Your skills seem more than adequate, and your renders are great! I'll definitely want to try this out when I get my Rift, and hopefully it can be incorporated to work in some games.  </p>
 <p>It would certainly be nice if all the correct components could be purchased from just a few locations. Hopefully some of us can help generate a list.</p>
@@ -1280,7 +1239,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-body">
       <p>While I agree it is probably best to focus more on refining your current method, I think it is worth exploring complimentary ideas even if they appear computationally expensive at this time. I think the variable lighting and calibration issues that come with that may be possible to sidestep by doing (near) real time calibration to match the data curve to that of the primary sensor data, and then use the comparison to reduce noise in the primary data? I don't even know how much noise there is to get rid of, or what kind of data resolution this method could provide but I thought it would be worth asking about.</p>
 <p>With regards to pattern recognition for point labeling, is this something that might be within the abilities of modern neural processing methods? Once again this is something that may seem computationally expensive now, but I think it won't be long before it is doable with common hardware, and it could provide for simpler (single infrared wavelength vs multiple visible leds) hardware and potentially more robust tracking in the future.</p>
-<p>Just some ideas to throw into the pool of consideration, I am very impressed with your current solution and look forward to using it as soon as possible.</p>
+<p>Just some ideas to throw into the pool of consideration, I am very impressed with your current solution and look forward to using it as soon as possible.  🙂</p>
     </div>
   </div>
 </article>
@@ -1444,7 +1403,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-body">
       <p>Thank you mahler for the info, especially for pointing out the difference between Europe and US patents.</p>
 <p>Still not crystal clear if posting the innovation on an internet forum is legally considered making it "publicly available" but i will assume it is (more so than any other method imho). Also interesting is the "grace period" part, which i understand protects the original inventor..</p>
-<p>Ok i think i have a better understanding now, i guess we can move on to more interesting stuff!</p>
+<p>Ok i think i have a better understanding now, i guess we can move on to more interesting stuff!   😛</p>
     </div>
   </div>
 </article>
@@ -1506,7 +1465,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-body">
       <blockquote><cite>Fredz wrote:</cite>So I guess by simply mentioning his technique, PatimPatam has basically prevented anyone from filing a patent on the same thing, at least in the US.</blockquote>
 <p>Looking at mahler’s post, i think it’s actually the opposite: i prevented anyone from filing a patent in Europe, but i still have one year to think if i want to try to patent in the US. Not that i would! (unless someone buys me off with stupids amount of money of course hahah).</p>
-<p>Ok, thanx again for all the input guys, can we change subject now?</p>
+<p>Ok, thanx again for all the input guys, can we change subject now?  🙂</p>
     </div>
   </div>
 </article>
@@ -1543,7 +1502,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Fri Feb 08, 2013 5:43 am</span> <a class="panchor" href="#p98520">#p98520</a></div>
     <div class="post-body">
-      <p>Working on it  </p>
+      <p>Working on it   🙂 </p>
 <p>I have been thinking about how to make the HW available for everyone, so it's both as cheap and as easy to mount as possible. The thing is you need a light but solid structure, and you need to be able to place the LEDs quite precisely in the right position; not sure if the foam core boards that MSat mentioned would allow that level of precision..</p>
 <p>3D printing would certainly be ideal, but i'm a bit concerned about the cost. I think we can discard cheap materials like ceramics, polyamide, plaster or sandstone, so we would have to go with proper plastic.</p>
 <p>I'm trying to minimize the volume (cm3) of the 3D model, while keeping it strong enough, in order to see if i can keep the cost reasonable, or if i should look for other options. For a 120 cm3 front section for instance i got a quote of 126$ on Sculpteo (<a href="http://3dprintingpricecheck.com/" target="_blank" rel="noopener">http://3dprintingpricecheck.com</a>), and you would still need to add the back section (about 60 or 80 cm3 probably) and the connection between both (not 3d printed), plus LEDs, etc.</p>
@@ -1567,7 +1526,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Fri Feb 08, 2013 11:33 pm</span> <a class="panchor" href="#p98709">#p98709</a></div>
     <div class="post-body">
       <p>If someone on here knows anybody that does plastic or fiberglass prop making (even hobby-level), they would be familiar with the process of creating a mold from a master that you could supply. From there, copies could be pulled relatively cheaply. At that point the tricky part would be finding people to produce said copies whenever there was enough interest and taking the bother to organize all of it.</p>
-<p>So, overall, it would trade the cost and precision issues for distribution and management issues.  Still, figured I'd toss the idea out there.</p>
+<p>So, overall, it would trade the cost and precision issues for distribution and management issues.  🙂  Still, figured I'd toss the idea out there.</p>
     </div>
   </div>
 </article>
@@ -1911,7 +1870,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Thu Feb 21, 2013 7:51 am</span> <a class="panchor" href="#p101581">#p101581</a></div>
     <div class="post-body">
-      <p>Yes that was one of the first things i checked after the reveal  </p>
+      <p>Yes that was one of the first things i checked after the reveal   🙂 </p>
 <p>I guess it’s too early to tell if we’ll be able to use it on PC, but 640x400@120fps would be nice!</p>
     </div>
   </div>
@@ -2005,7 +1964,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Mar 12, 2013 6:58 pm</span> <a class="panchor" href="#p106061">#p106061</a></div>
     <div class="post-body">
-      <p>Thanks for the interest Namielus, the truth is had a little break from this project during the last month. I’ve been doing some things that I neglected a bit before, like social life, playing the guitar and wedding preparations    Also started working on another VR related project which I cannot talk about for now..</p>
+      <p>Thanks for the interest Namielus, the truth is had a little break from this project during the last month. I’ve been doing some things that I neglected a bit before, like social life, playing the guitar and wedding preparations   🙂   Also started working on another VR related project which I cannot talk about for now..</p>
 <p>But don’t worry i’m hoping i can get back to it soon, hopefully before i get my brand new dev kit in a few weeks (number 46XX!). First thing I want to do is test some new LEDs I just received by post, which hopefully will help improve the detection distance quite a bit!</p>
     </div>
   </div>
@@ -2024,10 +1983,10 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Mar 19, 2013 11:44 am</span> <a class="panchor" href="#p108931">#p108931</a></div>
     <div class="post-body">
-      <p><strong>Oculus, hire this man!</strong> (Or at least steal his tech. ) PatimPatam, it's apparently true that no individual part of your design is really groundbreaking, but you've put it all together into a jaw-dropping package that would seem to require little additional R&amp;D to be entirely at home in the commercial Rift. With vestibular organs so sensitive to the slightest discrepancies, I really don't think you can build 100% of the required components for proper positional tracking into an HMD (or at least one anyone but DARPA can afford). That leaves two options: 1) <a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16117" target="_blank" rel="noopener">Building two cameras into the Rift</a> and relying on stereoscopic cues for tracking (I'd <em>love</em> for this to be the winner, because it would accidentally make the Rift a combination virtual reality <em>and</em> mediated reality headset, but I just don't think existing visual odometry algorithms can possibly cover enough real world cases for this to be reliable in a consumer product - prove me wrong!) 2) Markers and one or more cameras. 2 is more likely to win because the existing algorithms are more numerous and more mature; I don't see users placing markers around their rooms to accommodate cameras in the Rift itself (though I'd still love to get AR for free), and with a good marker rig you only need one camera, so that's the ultimate resolution I'm betting on. Maybe Oculus has or is developing a pet solution to this problem that will blow us all away, but I'm not terribly hopeful - my prediction is you've predicted the tracking system of the commercial Rift. Bravo! </p>
+      <p><strong>Oculus, hire this man!</strong> (Or at least steal his tech.  😂 ) PatimPatam, it's apparently true that no individual part of your design is really groundbreaking, but you've put it all together into a jaw-dropping package that would seem to require little additional R&amp;D to be entirely at home in the commercial Rift. With vestibular organs so sensitive to the slightest discrepancies, I really don't think you can build 100% of the required components for proper positional tracking into an HMD (or at least one anyone but DARPA can afford). That leaves two options: 1) <a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16117" target="_blank" rel="noopener">Building two cameras into the Rift</a> and relying on stereoscopic cues for tracking (I'd <em>love</em> for this to be the winner, because it would accidentally make the Rift a combination virtual reality <em>and</em> mediated reality headset, but I just don't think existing visual odometry algorithms can possibly cover enough real world cases for this to be reliable in a consumer product - prove me wrong!) 2) Markers and one or more cameras. 2 is more likely to win because the existing algorithms are more numerous and more mature; I don't see users placing markers around their rooms to accommodate cameras in the Rift itself (though I'd still love to get AR for free), and with a good marker rig you only need one camera, so that's the ultimate resolution I'm betting on. Maybe Oculus has or is developing a pet solution to this problem that will blow us all away, but I'm not terribly hopeful - my prediction is you've predicted the tracking system of the commercial Rift. Bravo!  😀 </p>
 <p>Now for the bad news - I don't see this selling more than maybe a few hundred units if it's an aftermarket device. Plenty of devs would buy it for their dev Rifts if they knew for sure they were getting something that would perfectly mimic what would eventually be built into the production model, but no amount of explaining why a consumer would want this is likely to make it catch on (short of half the people who use the Rift feeling ill from a lack of positional tracking, but if that happens we've all got bigger problems). Thing is, if we assume a cheap PS Eye-style camera is going to have to be sold alongside the Rift, building an array of LEDs into the housing is virtually free both from a parts standpoint and from an electronic standpoint. Integrate something like this into the design of the commercial Rift and I think you can fuse enough sensor data to produce head tracking that's at least adequate and probably much better.</p>
-<p>Things I would continue to iterate? I don't have your CS chops to prove it, but I'm not certain you need all those LEDs (or more than a single color). If you assume this is going to be strictly for seated usage (a huge majority of Rift usage will be seated, IMO), and assume the swivel chair solution to avatar rotation will ultimately be proven naive, suddenly you may not need those troublesome LEDs in the back. Moreover, even if you have a system with which occlusion is possible, I've long wondered why motion capture systems and the like didn't introduce algorithms that simply "faked" the hidden data, made good-enough guesses based on last-known locations and vectors tied to a large sample of those motions while fully tracked, then picked up the markers when they reappeared and smoothly interpolated back to the sensed position - instead, the historical solution has essentially seen computers saying, "Where'd that one ball go?! I don't see that one ball OH GOD YOUR DATA IS NOW USELESS *CRASH*" Have the algorithms improved? It's 2013 here, guys.  Something else to explore is using <a href="http://en.wikipedia.org/wiki/Electroluminescent_wire" target="_blank" rel="noopener">el wire</a> to present lit lines to track instead of points - it would have the added benefit of looking even cooler, too.  </p>
-<p>All in all, thanks - as far as I'm concerned positional head tracking for seated gameplay in the Rift 1.0 is a solved problem, and considering the number of <em>un</em>solved problems around here, that's a godsend. One wonders what we'll do for positional tracking while we wait for the Rift 1.0, of course, but I'm still hoping to get something halfway-usable out of two LED beacons and a 9-volt taped to a dev Rift and either Wiimotes or PS Eyes for tracking. Let me know if you intend to adapt your code to something like that because it's a problem on my list of things to tackle while I wait for #~8200 to be up - if I hit any major roadblocks when I get around to it myself you'll definitely be the first person I talk to. </p>
+<p>Things I would continue to iterate? I don't have your CS chops to prove it, but I'm not certain you need all those LEDs (or more than a single color). If you assume this is going to be strictly for seated usage (a huge majority of Rift usage will be seated, IMO), and assume the swivel chair solution to avatar rotation will ultimately be proven naive, suddenly you may not need those troublesome LEDs in the back. Moreover, even if you have a system with which occlusion is possible, I've long wondered why motion capture systems and the like didn't introduce algorithms that simply "faked" the hidden data, made good-enough guesses based on last-known locations and vectors tied to a large sample of those motions while fully tracked, then picked up the markers when they reappeared and smoothly interpolated back to the sensed position - instead, the historical solution has essentially seen computers saying, "Where'd that one ball go?! I don't see that one ball OH GOD YOUR DATA IS NOW USELESS *CRASH*" Have the algorithms improved? It's 2013 here, guys.  😂  Something else to explore is using <a href="http://en.wikipedia.org/wiki/Electroluminescent_wire" target="_blank" rel="noopener">el wire</a> to present lit lines to track instead of points - it would have the added benefit of looking even cooler, too.  😎  </p>
+<p>All in all, thanks - as far as I'm concerned positional head tracking for seated gameplay in the Rift 1.0 is a solved problem, and considering the number of <em>un</em>solved problems around here, that's a godsend. One wonders what we'll do for positional tracking while we wait for the Rift 1.0, of course, but I'm still hoping to get something halfway-usable out of two LED beacons and a 9-volt taped to a dev Rift and either Wiimotes or PS Eyes for tracking. Let me know if you intend to adapt your code to something like that because it's a problem on my list of things to tackle while I wait for #~8200 to be up - if I hit any major roadblocks when I get around to it myself you'll definitely be the first person I talk to.  😀 </p>
 <p>EDIT: Clarified a word. Tracker != marker. Correct terminology is important and/or I'm dumb.</p>
     </div>
   </div>
@@ -2068,7 +2027,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Mar 19, 2013 10:27 pm</span> <a class="panchor" href="#p109338">#p109338</a></div>
     <div class="post-body">
-      <p>I’m a bit late but I also want to say well done on this project!    I’ve not been around for a while and sadly haven’t had the time to test any tracking ideas yet myself but it’s really great to see the progress you have made since we all first started looking into PTAM etc.  I think the freedom your system gives is really imported even for seated play, I look forward to trying it out myself some day, we will have to have a good look at the SDK to see the best way to interface everything but hopefully it won’t be so hard.  Really I think the only thing you got wrong is the name, (I like Ladytron to - Destroy is a great track) but looking at the shape you really should have called it the “ <a href="https://www.google.co.uk/search?hl=en&amp;gs_rn=7&amp;gs_ri=psy-ab&amp;tok=iSjWIcN5BSJcBl1RtxbocA&amp;pq=kryton&amp;cp=4&amp;gs_id=3&amp;xhr=t&amp;q=kryten&amp;safe=off&amp;bav=on.2,or.r_qf.&amp;bvm=bv.44011176,d.d2k&amp;biw=1280&amp;bih=909&amp;um=1&amp;ie=UTF-8&amp;tbm=isch&amp;source=og&amp;sa=N&amp;tab=wi&amp;ei=aiNJUfeNI4r80QWf-ICABw/url" target="_blank" rel="noopener">Kryten</a> ”</p>
+      <p>I’m a bit late but I also want to say well done on this project!   😎   I’ve not been around for a while and sadly haven’t had the time to test any tracking ideas yet myself but it’s really great to see the progress you have made since we all first started looking into PTAM etc.  I think the freedom your system gives is really imported even for seated play, I look forward to trying it out myself some day, we will have to have a good look at the SDK to see the best way to interface everything but hopefully it won’t be so hard.  Really I think the only thing you got wrong is the name, (I like Ladytron to - Destroy is a great track) but looking at the shape you really should have called it the “ <a href="https://www.google.co.uk/search?hl=en&amp;gs_rn=7&amp;gs_ri=psy-ab&amp;tok=iSjWIcN5BSJcBl1RtxbocA&amp;pq=kryton&amp;cp=4&amp;gs_id=3&amp;xhr=t&amp;q=kryten&amp;safe=off&amp;bav=on.2,or.r_qf.&amp;bvm=bv.44011176,d.d2k&amp;biw=1280&amp;bih=909&amp;um=1&amp;ie=UTF-8&amp;tbm=isch&amp;source=og&amp;sa=N&amp;tab=wi&amp;ei=aiNJUfeNI4r80QWf-ICABw/url" target="_blank" rel="noopener">Kryten</a> ”    😂</p>
     </div>
   </div>
 </article>
@@ -2087,7 +2046,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Wed Mar 20, 2013 8:35 am</span> <a class="panchor" href="#p109527">#p109527</a></div>
     <div class="post-body">
       <p>Hahah, good geeky observation! Right up there with Mr Data's positronic brain!</p>
-<p>Hmm I might consider changing the name then (but then again maybe not)</p>
+<p>Hmm I might consider changing the name then (but then again maybe not)  😛</p>
     </div>
   </div>
 </article>
@@ -2105,7 +2064,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Wed Mar 20, 2013 11:50 am</span> <a class="panchor" href="#p109679">#p109679</a></div>
     <div class="post-body">
-      <p>Fair enough...  </p>
+      <p>Fair enough...  😂  </p>
 <p>Did you hear about the RasPi camera, it should be out very soon and can do 720p@60fps or VGA@90fps:</p>
 <p><a href="http://www.tweaktown.com/news/29201/more-details-on-raspberry-pi-s-camera-module-surface-still-aiming-for-25-and-up-to-2592x1944-stills/index.html" target="_blank" rel="noopener">http://www.tweaktown.com/news/29201/mor ... index.html</a></p>
 <p>Not sure that the Pi CPU has the power to run OpenCV locally though?</p>
@@ -2146,10 +2105,10 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Fri Mar 22, 2013 12:50 am</span> <a class="panchor" href="#p110564">#p110564</a></div>
     <div class="post-body">
-      <p>Sadly it doesn't look like you can use the GPU for much apart from video at the moment.   </p>
+      <p>Sadly it doesn't look like you can use the GPU for much apart from video at the moment.   😢  </p>
 <p><a href="http://www.raspberrypi.org/phpBB3/viewtopic.php?f=24&amp;t=3330" target="_blank" rel="noopener">http://www.raspberrypi.org/phpBB3/viewt ... =24&amp;t=3330</a><br><a href="http://www.raspberrypi.org/phpBB3//viewtopic.php?f=68&amp;t=12791" target="_blank" rel="noopener">http://www.raspberrypi.org/phpBB3//view ... 68&amp;t=12791</a><br><a href="http://www.raspberrypi.org/phpBB3/viewtopic.php?p=14633" target="_blank" rel="noopener">http://www.raspberrypi.org/phpBB3/viewtopic.php?p=14633</a></p>
 <p>It would be fun to try it, but if we have to do the processing on the PC anyway we would not have enough output bandwidth for RAW video, and H264 compression would probably add too much latency?  But I think we should still look into porting some of the OpenCV code to CUDA / OpenCL on the PC.</p>
-<p>One other idea for you... I thought maybe we could use a bright Ultra-Violet lamp to illuminate the player (and maybe a UV filter on the camera?) and then UV stickers (or paint dots) on the HMD instead of LEDs?  It would be easier to experiment with pattern changes, and maybe even a bit cheaper / easier to build, I will have to try it out some time.</p>
+<p>One other idea for you... I thought maybe we could use a bright Ultra-Violet lamp to illuminate the player (and maybe a UV filter on the camera?) and then UV stickers (or paint dots) on the HMD instead of LEDs?  It would be easier to experiment with pattern changes, and maybe even a bit cheaper / easier to build, I will have to try it out some time.   😎</p>
     </div>
   </div>
 </article>
@@ -2169,7 +2128,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-body">
       <p>Yep, looks like you're right. It's unfortunate that Broadcom haven't implemented an OpenCL driver for the VideoCore (and doesn't look like they will). To be honest that makes the RasPi much less appealing.. even if it was possible to send the video feed to a PC without much latency i think paying about $100 (raspi + cam board + case + power supply) for what would be basically a plain camera is a little bit too much.</p>
 <p>I have thought about porting to CUDA / OpenCL on the PC but the problem is that apparently using CUDA while playing games does not bear good results.. so unless you buy an extra graphics card just to take care of the tracking.. (could be an option actually).</p>
-<p>About the UV light idea, i'm not sure if it would be possible to discriminate between 3 or 4 different types of marker.. if i had more time in my hands sounds like it could be fun to test. Also not sure if it would be a good marketing strategy, forcing users to apply sunscreen before every VR session</p>
+<p>About the UV light idea, i'm not sure if it would be possible to discriminate between 3 or 4 different types of marker.. if i had more time in my hands sounds like it could be fun to test. Also not sure if it would be a good marketing strategy, forcing users to apply sunscreen before every VR session  😀</p>
     </div>
   </div>
 </article>
@@ -2188,7 +2147,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Sat Mar 23, 2013 12:43 am</span> <a class="panchor" href="#p111194">#p111194</a></div>
     <div class="post-body">
       <p>I hope something happens about getting more access to the GPU in the future, if they sell millions broadcom might come around, or maybe just one genius with enough time in his hands. Even without the GPU it might still be a good IP camera for large scale multi-camera environments, using a power-over-ethernet adapter etc.  Personally I think if we can get a ~30% speed-up using OpenCL on the PC side it’s worth a dedicated card, many have SLI systems now or use a old spare card for Nvidia PhysX, I know I would trade either for fast transnational tracking in a heart-beat!</p>
-<p>UV lamps are so cheap now this could be an option for home use, but I was thinking more for clubs / laser-tag arenas that already have UV lighting installed.  I would really like to play with UV when I get time, it should have excellent emissive uniformity and is very flexible, lots of different colors, different sized dots, shapes, lines etc.  I do worry about the relative brightness in sunlight though, but we don’t get much of that here in the UK anyway!  It’s ok for you in sunny Spain but I think many people here would be happy to play in VR and get a nice sun-tan at the same time!!</p>
+<p>UV lamps are so cheap now this could be an option for home use, but I was thinking more for clubs / laser-tag arenas that already have UV lighting installed.  I would really like to play with UV when I get time, it should have excellent emissive uniformity and is very flexible, lots of different colors, different sized dots, shapes, lines etc.  I do worry about the relative brightness in sunlight though, but we don’t get much of that here in the UK anyway!  It’s ok for you in sunny Spain but I think many people here would be happy to play in VR and get a nice sun-tan at the same time!!    💡   😎   😂</p>
     </div>
   </div>
 </article>
@@ -2229,7 +2188,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-meta"><span class="pdate">Wed Jan 08, 2014 4:24 am</span> <a class="panchor" href="#p146905">#p146905</a></div>
     <div class="post-body">
       <figure><a href="images/thread/06-Crystal_Cove1.JPG" target="_blank" rel="noopener"><img src="images/thread/06-Crystal_Cove1.JPG" alt="" loading="lazy"></a></figure>
-<p>"Crystal Cove", they call it. There's something so familiar here, but I just can't put my finger on it...</p>
+<p>"Crystal Cove", they call it. There's something so familiar here, but I just can't put my finger on it...   😂</p>
     </div>
   </div>
 </article>
@@ -2247,7 +2206,7 @@ TOTAL 8.30 ms aprox</pre>
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Wed Jan 08, 2014 5:45 am</span> <a class="panchor" href="#p146907">#p146907</a></div>
     <div class="post-body">
-      <p>Yes well, it looks like it wasn't such a crazy idea after all.  </p>
+      <p>Yes well, it looks like it wasn't such a crazy idea after all.   😛 </p>
 <p>Kind of surprised they went for more LEDs instead of less, but i guess that's the price you have to pay for using IR LEDs instead of colored ones (and you still want to have some redundancy).</p>
 <p>Would like to hear more details though, like how good is the robustness against occlusion (from your own hands/arms), or maximum tracking distance (could it be used in a living room for instance, putting the camera next to the TV and sitting on a sofa around 3 meters away from it?), or how much the tracking algorithm is going to tax the CPU/GPU (or will it be done by HW?).</p>
 <p>Also what are the actual prototype camera specs?<br>- Resolution?<br>- FOV?<br>- FPS?</p>
@@ -2430,7 +2389,7 @@ TOTAL 8.30 ms aprox</pre>
       <blockquote><cite>lossofmercy wrote:</cite>Do wireless cameras add that much more latency? I hope not, it would make my life a lot simpler. <br><br>Quote:The proportion of people who would benefit is tiny. Probably the same people who have rooms dedicated to VR and intend on getting walking platforms, etc.<br><br>I disagree, I think a lot of people would really want it. Think about all the people that bought the Omni or think about developers like Cloudhead games who are trying to make VR games and really desire 360 position tracking. They would need only one additional camera to make this possible. The most complicated thing that they would have to do, in addition to what they have already done, is a software that figures out the position of the camera in relation to the rift. I think they are already 80% there.</blockquote>
 <p>I think it will happen, but not at the outset. I think Oculus is initially targeting normal people who will sit in a stationary chair, and the number of people who have or will buy the Omni or something similar is going to be MAYBE 1% of those who buy the Rift. I think I'm being generous.</p>
 <p>I would bet that many more people who buy the Rift will also buy (or have already bought) a steering wheel or joystick peripheral.</p>
-<p>I hadn't heard anything about Cloudhead games desiring a 360 solution. Do you have a link? I can see how spelunking could benefit from that, though I would be somewhat afraid to allow myself that much freedom of movement in my room</p>
+<p>I hadn't heard anything about Cloudhead games desiring a 360 solution. Do you have a link? I can see how spelunking could benefit from that, though I would be somewhat afraid to allow myself that much freedom of movement in my room  😛</p>
     </div>
   </div>
 </article>
@@ -2450,7 +2409,7 @@ TOTAL 8.30 ms aprox</pre>
     <div class="post-body">
       <p><a href="http://www.reddit.com/r/oculus/comments/1un5w1/the_first_look_at_the_new_oculus_vr_prototype/cejryfm" target="_blank" rel="noopener">http://www.reddit.com/r/oculus/comments ... pe/cejryfm</a></p>
 <blockquote><cite>CloudHeadGames wrote:</cite>This would seem to limit the potential of a number of game play styles, especially in the first person. Rotational translations with analog and mouse tend to be the worst offenders in making people feel sick. We would love to get rid of right stick analog and even mouse rotations in favor of a "stand up and turn around" solution. If we are limited by 180 turns, that's a bit of a disappointment to be honest.<br>This is more of an issue when you have motion control systems in play of course.</blockquote>
-<p>That's the thing, they can target the masses with the basic one camera setup. They look like they already have it mostly down that they could go for an easy upgrade option. All they are losing is development time to sync the data between two cameras. And if it's easy to setup, then people would buy it as well. Well... if it's wireless.</p>
+<p>That's the thing, they can target the masses with the basic one camera setup. They look like they already have it mostly down that they could go for an easy upgrade option. All they are losing is development time to sync the data between two cameras. And if it's easy to setup, then people would buy it as well. Well... if it's wireless.  😀</p>
     </div>
   </div>
 </article>
@@ -2473,7 +2432,7 @@ TOTAL 8.30 ms aprox</pre>
 <p>I think the bigger hurdle (rather than wireless cameras), would be a wireless HMD. If you spin around a few thousand degrees the cables are going to get tangled regardless of how you mount them. Wired cameras are a much easier problem to deal with since they'd be stationary.</p>
 <p>I'm still certain most people won't make use of more than 180 degrees though. Just as most people don't make use of the Kinect or PS Move due to lack of space. Also the reason people abandoned music games due to peripherals and dance mats taking up too much space.</p>
 <p>I find the steering wheel I have to be a pain to mount and unmount over and over again and storing the pedals is also annoying. The proportion of people who will benefit from more than 180 degrees is likely the same people who have racing seats for sim racing. ie too small to bother catering for in the first iteration of the commercial product. Or maybe there will be a Rift Pro for commercial/research purposes which has additional features?</p>
-<p>These are awesome problems to be discussing as I didn't expect things to come so far so quickly</p>
+<p>These are awesome problems to be discussing as I didn't expect things to come so far so quickly  🙂</p>
     </div>
   </div>
 </article>
@@ -2709,7 +2668,7 @@ S     --&gt;  V        Head stopped in forward position / Constant veloc
 <p>All methods of input are enabled at the same time (using different buttons explained on the readme) so you can try different combinations, thumbstick to move and HandBased Rotation to rotate, play with the sensitivity adjustments, etc. You can also try stepping in front instead of leaning, but personally prefer to stay in place.</p>
 <p>For me the best combination by far is <strong>Head-Based Translation + Hand-Based Rotation</strong>, but i left the other options so people could test them. I'm quite certain i will settle for this or a very similar control scheme in the game that i'm working on, but would be honored if other games or apps considered it.</p>
 <p><strong>PROS</strong><br>- Intuitive and easy to learn<br>- It can attenuate simulation sickness<br>- Responsive, precise and smooth (considerably more than using wasd keys or gamepad thumbsticks)<br>- Simplifies hand controls (from 2 thumbsticks to only 1 or 2 buttons), freedom to do other things, ideal in combination with motion controls, motion capture cameras or even pedals<br>- Decoupling of movement and vision -&gt; allows richer interactions<br>- Works both standing and seated</p>
-<p><strong>CONS</strong><br>- Can't turn and do something that involves rotating both hands at the same time<br>- Requires HMD positional tracking and motion controls so not applicable to something like GearVR. Having said that since only rotational tracking of the hands is required i guess something like the DroidGlove could be used instead of the Hydra/Stem/Move:<br> <a href="http://cubic9.com/Devel/OculusRift/DroidGlove_en/" target="_blank" rel="noopener">http://cubic9.com/Devel/OculusRift/DroidGlove_en/</a><br>- Might be a bit biased, but i can't think of any other one right now  </p>
+<p><strong>CONS</strong><br>- Can't turn and do something that involves rotating both hands at the same time<br>- Requires HMD positional tracking and motion controls so not applicable to something like GearVR. Having said that since only rotational tracking of the hands is required i guess something like the DroidGlove could be used instead of the Hydra/Stem/Move:<br> <a href="http://cubic9.com/Devel/OculusRift/DroidGlove_en/" target="_blank" rel="noopener">http://cubic9.com/Devel/OculusRift/DroidGlove_en/</a><br>- Might be a bit biased, but i can't think of any other one right now   😛 </p>
 <h4>RESULTS</h4>
 <p>Personally i don't usually get motion sickness so i'm not the best test subject. I tested with only 3 people apart from me and no sim-sickness reported using hydra motion-controls, one of them experienced a bit of dizziness using standard thumbsticks.</p>
 <p>The only discomfort that was mentioned by one of the users (my brother) was when crashing into a wall, so i would advise please try not to crash into walls when testing, this will create a mismatch. Maybe it could be sold as a feature to increase immersion: you wouldn't crash your head against a wall in Real-Life, don't do it in VR either!</p>
@@ -2720,7 +2679,7 @@ S     --&gt;  V        Head stopped in forward position / Constant veloc
 <p>So i adapted/modded the UE4 SUN TEMPLE map for VR using the VR Template provided by mitchemmc from the Epic forums. I think it's an awesome map, looks good and runs quite well since it was originally optimized for mobile hardware. Another advantage is that it's quite small with close walls and columns so it has a good amount of vection.</p>
 <p>The only problem with it is that it has 2 different levels and stairs in between, which is not good since this can induce sim-sickness too. I wanted to remove this problem from the equation so i decided to remove the stairs and flatten out the whole map; unfortunately the first hallway was a bit too much work to put at the same level as the rest so it's not accessible at the moment.</p>
 <p>Here are some of the changes i made to the original level:<br>- Flattened map (minus hallway)<br>- Removed a few things for performance<br>- Changed scale / location of some objects that didn't look quite right in VR<br>- Adapted lighting / post-process<br>- Revised collisions<br>- Added ambient sounds<br>- Added avatar from VR template, slightly tweaked (i know animations could be improved a lot)</p>
-<p>So basically i butchered the whole map, apologies to the original designers at Epic!  </p>
+<p>So basically i butchered the whole map, apologies to the original designers at Epic!   😛 </p>
 <h4>PERFORMANCE AND OTHER CONSIDERATIONS</h4>
 <ul><li>The demo is compatible with <strong>0.4.2 -&gt; 0.4.4 Oculus runtimes</strong>, although i don't really recommend 0.4.3.</li><li>The best performance for me is with <strong>0.4.2 Direct Mode / Mirroring OFF / AERO OFF</strong> (hmd sp 140).</li><li>I think it's VERY IMPORTANT to tweak the <strong>Screen Percentage</strong> value as best as you can for your machine. It has a big impact in visual fidelity so it should always be the maximum possible that allows you to run at constant 75 fps. You can access it in the menu (start button to enter menu and right trigger to select).<br><br>By default it's 130. If the demo is not running at constant 75 fps try to turn it down until it does. If the demo is running at constant 75 fps try to turn it up until it doesn't and then turn it back down again.</li><li>As always there is a tradeoff, 0.4.4 has awesome <strong>near-0 low latency</strong> but in my case i have to turn down the screen percentage too low for my taste (110), that's why personally i prefer 0.4.2</li><li>If using <strong>0.4.4 Direct Mode -&gt; Turn Aero ON!</strong></li><li>Remember to leave <strong>Razer Hydra on the base</strong> until the demo has started!</li><li>I recommend <strong>playing standing in place</strong> to get a better sense of immersion/presence.</li><li>Try to <strong>avoid crashing into walls</strong> or anything that will suddently stop your avatar as this can easily induce sim-sickness.</li><li><strong>Ambient Sound:</strong> I did a very quick job with this so i recommend to play it at very <strong>low volume</strong> (so you can barely hear your own steps) and without headphones (as it will only help you notice that there is no proper audio spatialization).</li></ul>
 <h4>TO FINISH OFF</h4>
@@ -2842,7 +2801,7 @@ S     --&gt;  V        Head stopped in forward position / Constant veloc
     <div class="post-meta"><span class="pdate">Thu Dec 25, 2014 2:17 pm</span> <a class="panchor" href="#p230707">#p230707</a></div>
     <div class="post-body">
       <p>Ok here's the LINK to the Reddit discussion, for future reference:<br><a href="http://www.reddit.com/r/oculus/comments/2q9xmk/my_experiments_to_reduce_motion_sickness_ue4_sun/" target="_blank" rel="noopener">http://www.reddit.com/r/oculus/comments/2q9xmk/my_experiments_to_reduce_motion_sickness_ue4_sun/</a></p>
-<p>So far not too many reviews, but happy to hear there's a few people that agree <strong>Head-Based Translation</strong> is a good method for locomotion, and at least a couple that find<strong> Head-Based Rotation</strong> both more intuitive and less sickness inducing than using thumbsticks. I guess i'm not completely bonkers </p>
+<p>So far not too many reviews, but happy to hear there's a few people that agree <strong>Head-Based Translation</strong> is a good method for locomotion, and at least a couple that find<strong> Head-Based Rotation</strong> both more intuitive and less sickness inducing than using thumbsticks. I guess i'm not completely bonkers  😛 </p>
 <p>Especially interested to hear the opinion about <strong>Hand-Based Rotation</strong> from people who have Razer Hydras.</p>
 <p>Thanks again for the replies, more comments are welcome!</p>
     </div>
@@ -2888,7 +2847,7 @@ S     --&gt;  V        Head stopped in forward position / Constant veloc
   <div class="post-main">
     <div class="post-meta"><span class="pdate">Tue Feb 17, 2015 5:22 pm</span> <a class="panchor" href="#p246022">#p246022</a></div>
     <div class="post-body">
-      <p>Love the detailed writeup and after trying this recently I have to say you are on to something here. Really great job </p>
+      <p>Love the detailed writeup and after trying this recently I have to say you are on to something here. Really great job  🙂 </p>
 <p>To reiterate what I said on reddit:</p>
 <p>There are a few adjustments I would make, but I think this form of navigation is the perfect balance between an omni and full comfort mode of teleporting/guided walk.</p>
 <p><em>What works</em><br>-Left hydra lean for walking and stopping. Sidestepping works great!</p>
@@ -2919,7 +2878,7 @@ S     --&gt;  V        Head stopped in forward position / Constant veloc
 <p>Regarding your issues:</p>
 <p>The main problem i found with turning when fully stopped is that it's easy to trigger translation involuntarily.. on the new version that i will publish soon i tweaked it a bit, making the amount of rotation proportionally reduce the amount of translation applied, and this seems to work really well.</p>
 <p>I was also aware about the other problem with controlling when to stop, and it was quite easy to fix actually; on the 1st version i was probably a bit too strict with the threshold i set (because i didn't want the user to feel any "jump"), but now i made this stop threshold a bit higher by default and also configurable.</p>
-<p>If you are interested i can send you some of my blueprints, a few of them are a bit trickier than you might think initially</p>
+<p>If you are interested i can send you some of my blueprints, a few of them are a bit trickier than you might think initially   😛</p>
     </div>
   </div>
 </article>

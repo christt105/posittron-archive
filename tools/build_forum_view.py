@@ -61,6 +61,23 @@ VIDEOS = {
     "nsl43qbMnOA": "PosiTTron: 6 DOF head-tracking prototype for VR - 02",
 }
 
+SMILIES = {
+    "icon_e_smile": "\U0001F642",     # :)
+    "icon_e_biggrin": "\U0001F600",   # :D
+    "icon_razz": "\U0001F61B",        # :-P
+    "icon_lol": "\U0001F602",         # :lol:
+    "icon_cool": "\U0001F60E",        # 8-)
+    "icon_mrgreen": "\U0001F606",     # :mrgreen:
+    "icon_idea": "\U0001F4A1",        # :idea:
+    "icon_cry": "\U0001F622",         # :cry:
+    "icon_sad": "\U0001F61E",         # :(
+    "icon_wink": "\U0001F609",        # ;)
+    "icon_neutral": "\U0001F610",     # :|
+    "icon_surprised": "\U0001F62E",   # :o
+    "icon_confused": "\U0001F615",    # :?
+    "icon_exclaim": "❗",         # :!:
+}
+
 _avatar_cache = {}
 _image_cache = {}
 _counter = [0]
@@ -185,6 +202,25 @@ def is_content_img(node):
     return not any(s in src for s in SKIP_IMG_SUBSTR)
 
 
+BULLET_LINE = re.compile(r"^\s*(?:[-*]|\d+[-.)])\s*\S")
+COLUMN_GAP = re.compile(r"\S {3,}\S")
+
+
+def pseudo_list_block(text):
+    """phpBB let people post a <ul>/<ol> with no real <li> children: just
+    space-aligned plain text. Tables (aligned columns) stay monospaced;
+    simple one-marker-per-line bullets become a real wrapping list instead
+    of forcing a horizontal scrollbar on long lines.
+    """
+    lines = [l for l in text.split("\n") if l.strip()]
+    if any(COLUMN_GAP.search(l) for l in lines):
+        return ("pre", text)
+    if lines and all(BULLET_LINE.match(l) for l in lines):
+        items = [re.sub(r"^\s*(?:[-*]|\d+[-.)])\s*", "", l).strip() for l in lines]
+        return ("list", "<ul>" + "".join(f"<li>{i}</li>" for i in items) + "</ul>")
+    return ("p", "<br>".join(lines))
+
+
 def convert(postbody, page_ts):
     """phpBB postbody -> list of (kind, payload) blocks, generalised to any author."""
     blocks, buf, brs = [], [], 0
@@ -213,6 +249,10 @@ def convert(postbody, page_ts):
                 if rel:
                     blocks.append(("img", rel))
                 continue
+            if "smilies" in node.get("src", ""):
+                stem = os.path.splitext(os.path.basename(node["src"]))[0]
+                buf.append(" " + SMILIES.get(stem, node.get("alt", "")) + " ")
+                continue
             brs = 0
             continue
 
@@ -227,7 +267,7 @@ def convert(postbody, page_ts):
             else:
                 text = B.as_pre(node)
                 if text.strip():
-                    blocks.append(("pre", text))
+                    blocks.append(pseudo_list_block(text))
             continue
 
         if isinstance(node, Tag) and node.name == "dl":
@@ -472,7 +512,10 @@ img{max-width:100%;height:auto}
 .pdetails dd{margin:0}
 .post-main{flex:1;min-width:0;padding:14px 18px}
 .post-meta{display:flex;justify-content:space-between;color:var(--dim);font-size:.8rem;border-bottom:1px dashed var(--line);padding-bottom:8px;margin-bottom:10px}
+.post-body{overflow-wrap:break-word}
 .post-body p{margin:.6em 0}
+.post-body ul,.post-body ol{margin:.6em 0;padding-left:1.4em}
+.post-body li{margin:.3em 0}
 .post-body blockquote{background:#eef2f6;border-left:3px solid var(--accent);margin:.8em 0;padding:.5em .9em;font-size:.93em}
 .post-body blockquote cite{display:block;font-weight:700;font-size:.8em;color:var(--dim);margin-bottom:.3em;font-style:normal}
 .post-body figure{margin:.8em 0}
