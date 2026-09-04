@@ -13,6 +13,10 @@ offline or lost their images:
   in moving through VR environments without inducing simulation sickness.
 
 Open `index.html` in any browser. No build step, no dependencies, no JavaScript.
+The "Full forum threads" button links to `forum.html`, a second page reproducing
+both threads in full: all 131 posts from every participant, with every avatar
+and inline image downloaded locally, in case the underlying MTBS3D/Oculus
+threads or their Wayback captures ever disappear.
 
 ## Why this exists
 
@@ -36,13 +40,16 @@ edited, corrected, condensed or paraphrased.
 ## What is in here
 
 ```
-index.html                          the archive page
-images/                             15 images at original resolution
+index.html                          the archive page (Jordi's posts, curated)
+forum.html                          both threads in full, every post and author
+images/                             15 curated images at original resolution
+images/avatars/                     every distinct avatar used across both threads
+images/thread/                      inline images posted by other participants
 sources/mtbs3d-thread-full.txt      all 120 posts of the MTBS3D thread
 sources/oculus-thread-full.txt      all 11 posts of the Oculus thread
 sources/sun-temple-mod-README.txt   README.txt shipped inside the mod
 sources/raw-html/                   the four Wayback captures, exactly as retrieved
-tools/                              the scripts that produced the page
+tools/                              the scripts that produced the pages
 ```
 
 The `sources/raw-html/` captures are kept so every claim on the page can be
@@ -62,6 +69,19 @@ cd tools && POSITTRON_SRC=../sources/raw-html python3 verify.py
 It should report `RESULT: no text lost`. The only two deliberate differences it
 allows are phpBB's own `Code: Select all` button label, and long `-----` rules
 that became `<hr>` elements.
+
+`forum.html` is produced separately by `tools/build_forum_view.py`, which
+parses every post in `sources/raw-html/` and downloads each avatar and inline
+image it finds (skipping forum chrome: smilies, rank icons, ads). It's
+idempotent, rerun it after re-fetching a capture:
+
+```sh
+cd tools && python3 build_forum_view.py
+```
+
+Two avatars (`inutile` and `saviornt` on the Oculus thread) have no Wayback
+snapshot at any timestamp and fall back to a plain initials badge; everything
+else downloaded successfully.
 
 The Sun Temple MOD download itself (a 507 MB packaged UE4 build) is too large
 for the repository, so it is mirrored as a release asset:
