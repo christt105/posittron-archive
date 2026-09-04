@@ -1,5 +1,7 @@
 # PosiTTron archive
 
+**Read it here: <https://christt105.github.io/posittron-archive/>**
+
 A restored, self-contained archive of two pieces of work by **Jordi Batallé**
 (`PatimPatam`), recovered after most of the places they were published went
 offline or lost their images:
@@ -61,8 +63,10 @@ It should report `RESULT: no text lost`. The only two deliberate differences it
 allows are phpBB's own `Code: Select all` button label, and long `-----` rules
 that became `<hr>` elements.
 
-Not included: the Sun Temple MOD download itself (a 507 MB packaged UE4 build).
-It is still live at
+The Sun Temple MOD download itself (a 507 MB packaged UE4 build) is too large
+for the repository, so it is mirrored as a release asset:
+[sun-temple-mod-2014](https://github.com/christt105/posittron-archive/releases/tag/sun-temple-mod-2014).
+The original MediaFire link from the 2014 post is still live too, at
 <https://www.mediafire.com/file/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip/file>.
 
 ## Publishing it
