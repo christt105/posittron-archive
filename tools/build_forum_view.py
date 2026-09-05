@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Build index.html: the full MTBS3D + Oculus threads, every post, every
-avatar and every inline image, reproduced as they looked on the forum.
+"""Build the full-forum pages: index.html (a hub linking to the two threads),
+posittron.html (the MTBS3D thread) and sun-temple.html (the Oculus thread),
+every post, every avatar and every inline image, reproduced as they looked
+on the forum.
 
 This is the main entry point of the site. Unlike render_page.py (which
 renders only Jordi Batalle's own posts into a clean article, as archive.html)
 this renders *all* posts from all authors, downloading every avatar and
-content image referenced so the page has no external dependency.
+content image referenced so the pages have no external dependency.
 """
 
 import html as html_mod
@@ -27,7 +29,9 @@ RAW = os.path.join(ROOT, "sources", "raw-html")
 IMAGES = os.path.join(ROOT, "images")
 AVATAR_DIR = os.path.join(IMAGES, "avatars")
 THREAD_DIR = os.path.join(IMAGES, "thread")
-OUT = os.path.join(ROOT, "index.html")
+OUT_HUB = os.path.join(ROOT, "index.html")
+OUT_POSITTRON = os.path.join(ROOT, "posittron.html")
+OUT_SUNTEMPLE = os.path.join(ROOT, "sun-temple.html")
 
 WAYBACK_HOST = re.compile(r"^https?://web\.archive\.org")
 WAYBACK_TS = re.compile(r"^/web/\d+[a-z_]*/")
@@ -523,6 +527,8 @@ img{max-width:100%;height:auto}
 .post-body pre.ascii{background:#0f1720;color:#d7e2ec;padding:10px;border-radius:4px;overflow-x:auto;font-family:var(--mono);font-size:.82em}
 .post-body .video-frame{position:relative;padding-top:56.25%}
 .post-body .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hub-card{display:block;text-decoration:none;color:inherit;margin-bottom:14px}
+.hub-card:hover{border-color:var(--accent)}
 @media (max-width: 640px){
   .post{flex-direction:column}
   .post-side{width:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
@@ -541,6 +547,36 @@ def render_thread(title, source_note, groups):
         for p in posts:
             parts.append(render_post(p))
     return "\n".join(parts)
+
+
+def page_shell(title, description, topbar_title, topbar_links, body):
+    links_html = "\n  ".join(f'<a href="{href}">{label}</a>' for href, label in topbar_links)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{description}">
+<meta name="author" content="Jordi Batall&eacute; (PatimPatam)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{description}">
+<meta property="og:image" content="images/07-finished-prototype.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='9' fill='%236ec6ff'/></svg>">
+<style>{CSS}</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="title">{topbar_title}</span>
+  {links_html}
+</div>
+<div class="wrap">
+{body}
+</div>
+</body>
+</html>
+"""
 
 
 def main():
@@ -576,41 +612,55 @@ def main():
         [(None, ocu_posts)],
     )
 
-    page = f"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PosiTTron &amp; Sun Temple MOD: full forum threads, recovered</title>
-<meta name="description" content="Every post from the PosiTTron (2013) and Sun Temple MOD (2014) forum threads by Jordi Batall&eacute; (PatimPatam), restored from Internet Archive snapshots after the originals went offline.">
-<meta name="author" content="Jordi Batall&eacute; (PatimPatam)">
-<meta property="og:type" content="article">
-<meta property="og:title" content="PosiTTron &amp; Sun Temple MOD: full forum threads, recovered">
-<meta property="og:description" content="Every post from both threads, avatars and inline images restored locally, in case the originals disappear.">
-<meta property="og:image" content="images/07-finished-prototype.jpg">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='9' fill='%236ec6ff'/></svg>">
-<style>{CSS}</style>
-</head>
-<body>
-<div class="topbar">
-  <span class="title">PosiTTron archive &middot; full forum threads</span>
-  <a href="archive.html">curated article view &rarr;</a>
-</div>
-<div class="wrap">
-  <p style="color:#5c6b7a;font-size:.85rem">
-    Every post, exactly as written, restored from Wayback Machine captures.
-    Avatars and inline images are downloaded locally; nothing here is hotlinked.
-  </p>
-  {mtbs_html}
-  <hr style="margin:40px 0;border:0;border-top:1px solid #d3dae3">
-  {ocu_html}
-</div>
-</body>
-</html>
-"""
-    with open(OUT, "w", encoding="utf-8") as f:
-        f.write(page)
-    print("wrote", OUT, len(mtbs_posts) + len(ocu_posts), "posts total")
+    disclaimer = ('  <p style="color:#5c6b7a;font-size:.85rem">\n'
+                  '    Every post, exactly as written, restored from Wayback Machine captures.\n'
+                  '    Avatars and inline images are downloaded locally; nothing here is hotlinked.\n'
+                  '  </p>')
+
+    hub_body = (
+        f"{disclaimer}\n"
+        f'  <a class="thread-header hub-card" href="posittron.html">'
+        f'<h1>POSITTRON: yet another proposal for positional head-tracking</h1>'
+        f'<div class="src">MTBS3D forum &middot; started 8 Jan 2013 &middot; {len(mtbs_posts)} posts</div></a>\n'
+        f'  <a class="thread-header hub-card" href="sun-temple.html">'
+        f'<h1>VR Navigation Experiments (UE4 Sun Temple MOD)</h1>'
+        f'<div class="src">Oculus VR Forums &middot; started 22 Dec 2014 &middot; {len(ocu_posts)} posts</div></a>\n'
+        f'  <p style="margin-top:24px"><a href="archive.html">Prefer a single curated article instead? &rarr;</a></p>'
+    )
+    hub_page = page_shell(
+        "PosiTTron &amp; Sun Temple MOD: full forum threads, recovered",
+        "Every post from the PosiTTron (2013) and Sun Temple MOD (2014) forum threads by "
+        "Jordi Batall&eacute; (PatimPatam), restored from Internet Archive snapshots after "
+        "the originals went offline.",
+        "PosiTTron archive &middot; full forum threads",
+        [("archive.html", "curated article view &rarr;")],
+        hub_body,
+    )
+
+    posittron_page = page_shell(
+        "PosiTTron: full MTBS3D forum thread, recovered",
+        "All 120 posts of the 2013 PosiTTron thread on MTBS3D, restored from a Wayback "
+        "Machine snapshot with every avatar and inline image downloaded locally.",
+        "PosiTTron archive &middot; MTBS3D thread",
+        [("index.html", "all threads"), ("sun-temple.html", "Sun Temple MOD thread &rarr;")],
+        f"{disclaimer}\n  {mtbs_html}",
+    )
+
+    suntemple_page = page_shell(
+        "Sun Temple MOD: full Oculus forum thread, recovered",
+        "All 11 posts of the 2014 Sun Temple MOD / VR navigation thread on the Oculus "
+        "developer forums, restored from a Wayback Machine snapshot after the original "
+        "went offline (the migrated Meta URLs now return 403).",
+        "PosiTTron archive &middot; Sun Temple MOD thread",
+        [("index.html", "all threads"), ("posittron.html", "&larr; PosiTTron thread")],
+        f"{disclaimer}\n  {ocu_html}",
+    )
+
+    for out, page in ((OUT_HUB, hub_page), (OUT_POSITTRON, posittron_page), (OUT_SUNTEMPLE, suntemple_page)):
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(page)
+        print("wrote", out)
+    print(len(mtbs_posts) + len(ocu_posts), "posts total")
 
 
 if __name__ == "__main__":
