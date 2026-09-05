@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build forum.html: the full MTBS3D + Oculus threads, every post, every
+"""Build index.html: the full MTBS3D + Oculus threads, every post, every
 avatar and every inline image, reproduced as they looked on the forum.
 
-Unlike build_site.py (which renders only Jordi Batalle's own posts into a
-clean article), this renders *all* posts from all authors, downloading every
-avatar and content image referenced so the page has no external dependency.
+This is the main entry point of the site. Unlike render_page.py (which
+renders only Jordi Batalle's own posts into a clean article, as archive.html)
+this renders *all* posts from all authors, downloading every avatar and
+content image referenced so the page has no external dependency.
 """
 
 import html as html_mod
@@ -26,7 +27,7 @@ RAW = os.path.join(ROOT, "sources", "raw-html")
 IMAGES = os.path.join(ROOT, "images")
 AVATAR_DIR = os.path.join(IMAGES, "avatars")
 THREAD_DIR = os.path.join(IMAGES, "thread")
-OUT = os.path.join(ROOT, "forum.html")
+OUT = os.path.join(ROOT, "index.html")
 
 WAYBACK_HOST = re.compile(r"^https?://web\.archive\.org")
 WAYBACK_TS = re.compile(r"^/web/\d+[a-z_]*/")
@@ -580,13 +581,20 @@ def main():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Full forum threads &middot; PosiTTron archive</title>
+<title>PosiTTron &amp; Sun Temple MOD: full forum threads, recovered</title>
+<meta name="description" content="Every post from the PosiTTron (2013) and Sun Temple MOD (2014) forum threads by Jordi Batall&eacute; (PatimPatam), restored from Internet Archive snapshots after the originals went offline.">
+<meta name="author" content="Jordi Batall&eacute; (PatimPatam)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PosiTTron &amp; Sun Temple MOD: full forum threads, recovered">
+<meta property="og:description" content="Every post from both threads, avatars and inline images restored locally, in case the originals disappear.">
+<meta property="og:image" content="images/07-finished-prototype.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='9' fill='%236ec6ff'/></svg>">
 <style>{CSS}</style>
 </head>
 <body>
 <div class="topbar">
   <span class="title">PosiTTron archive &middot; full forum threads</span>
-  <a href="index.html">&larr; back to the article</a>
+  <a href="archive.html">curated article view &rarr;</a>
 </div>
 <div class="wrap">
   <p style="color:#5c6b7a;font-size:.85rem">

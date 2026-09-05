@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PosiTTron: Jordi Batall&eacute;'s DIY VR positional tracking, recovered</title>
+<meta name="description" content="A restored archive of PosiTTron (2013), a DIY 6-DOF positional tracking system for the Oculus Rift built by Jordi Batall&eacute;, plus the 2014 Sun Temple VR navigation experiments. Rebuilt from Internet Archive snapshots after the original images and forum threads went offline.">
+<meta name="author" content="Jordi Batall&eacute; (PatimPatam)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PosiTTron: DIY VR positional tracking, 2013">
+<meta property="og:description" content="Cardboard, 22 LEDs and a PlayStation Eye. Recovered from dead links and broken images.">
+<meta property="og:image" content="images/07-finished-prototype.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='9' fill='%236ec6ff'/></svg>">
+<style>
+:root{
+  --bg:#0b0d10; --elev:#12151a; --panel:#161a20; --line:#262c35; --line-soft:#1d222a;
+  --text:#e7eaee; --dim:#98a2b0; --faint:#6b7684;
+  --accent:#6ec6ff; --accent-2:#ffcc66;
+  --led-r:#ff5f5f; --led-g:#4ade80; --led-b:#60a5fa; --led-w:#f1f5f9; --led-y:#fbbf24;
+  --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Charter","Iowan Old Style","Source Serif Pro",Georgia,Cambria,serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--ui);
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%;height:auto;display:block}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.narrow{max-width:720px;margin-left:auto;margin-right:auto}
+
+/* ---------- nav ---------- */
+nav{
+  position:sticky;top:0;z-index:50;background:rgba(11,13,16,.82);
+  backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line-soft);
+}
+nav .wrap{display:flex;align-items:center;gap:22px;height:54px;overflow-x:auto}
+nav .brand{font-weight:650;letter-spacing:-.01em;color:var(--text);white-space:nowrap}
+nav .brand span{color:var(--accent)}
+nav .links{display:flex;gap:20px;margin-left:auto}
+nav .links a{color:var(--dim);font-size:.87rem;white-space:nowrap}
+nav .links a:hover{color:var(--text);text-decoration:none}
+nav .btn-forum{
+  flex:none;background:var(--accent);color:#0b0d10;font-weight:650;font-size:.85rem;
+  padding:7px 14px;border-radius:999px;white-space:nowrap;
+}
+nav .btn-forum:hover{background:var(--accent-2);text-decoration:none}
+
+/* ---------- hero ---------- */
+header.hero{
+  position:relative;overflow:hidden;padding:88px 0 64px;
+  border-bottom:1px solid var(--line-soft);
+  background:
+    radial-gradient(900px 380px at 18% -10%,rgba(110,198,255,.13),transparent 62%),
+    radial-gradient(700px 340px at 88% 6%,rgba(255,204,102,.09),transparent 60%);
+}
+.leds{display:flex;gap:9px;margin-bottom:26px}
+.leds i{width:9px;height:9px;border-radius:50%;display:block}
+.leds i:nth-child(1){background:var(--led-r);box-shadow:0 0 12px var(--led-r)}
+.leds i:nth-child(2){background:var(--led-g);box-shadow:0 0 12px var(--led-g)}
+.leds i:nth-child(3){background:var(--led-b);box-shadow:0 0 12px var(--led-b)}
+.leds i:nth-child(4){background:var(--led-w);box-shadow:0 0 12px var(--led-w)}
+.leds i:nth-child(5){background:var(--led-y);box-shadow:0 0 12px var(--led-y)}
+.eyebrow{
+  font-size:.76rem;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--accent);font-weight:600;margin-bottom:18px;
+}
+h1{
+  font-size:clamp(3rem,9vw,5.6rem);line-height:.98;margin:0 0 22px;
+  letter-spacing:-.035em;font-weight:700;
+}
+h1 .tt{color:var(--accent)}
+.lede{font-family:var(--serif);font-size:clamp(1.12rem,2.3vw,1.36rem);line-height:1.6;color:#cdd4dd;max-width:44rem;margin:0 0 30px}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  font-size:.8rem;color:var(--dim);border:1px solid var(--line);
+  background:var(--elev);padding:6px 13px;border-radius:999px;
+}
+.chip b{color:var(--text);font-weight:600}
+
+/* ---------- sections ---------- */
+section{padding:76px 0;border-bottom:1px solid var(--line-soft)}
+.sec-label{
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.15em;
+  color:var(--faint);font-weight:600;margin-bottom:14px;
+}
+h2{font-size:clamp(1.7rem,3.6vw,2.4rem);line-height:1.15;letter-spacing:-.025em;margin:0 0 20px;font-weight:680}
+.sec-intro{color:var(--dim);max-width:44rem;font-size:1.02rem}
+.sec-intro strong{color:var(--text);font-weight:600}
+
+/* ---------- callout ---------- */
+.callout{
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  background:var(--elev);border-radius:0 10px 10px 0;padding:20px 24px;margin:28px 0;
+}
+.callout p{margin:0;color:#c9d1db;font-size:.97rem}
+.callout p + p{margin-top:12px}
+
+/* ---------- timeline ---------- */
+.tl{list-style:none;margin:34px 0 0;padding:0 0 0 26px;border-left:1px solid var(--line);max-width:46rem}
+.tl li{position:relative;padding:0 0 30px 22px}
+.tl li::before{
+  content:"";position:absolute;left:-31px;top:7px;width:9px;height:9px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 4px var(--bg),0 0 12px rgba(110,198,255,.55);
+}
+.tl li.ctx::before{background:var(--faint);box-shadow:0 0 0 4px var(--bg)}
+.tl .when{font-size:.79rem;color:var(--accent);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.tl li.ctx .when{color:var(--faint)}
+.tl .what{margin-top:5px;color:#d5dbe3}
+.tl li.ctx .what{color:var(--dim)}
+.tl .what > em{color:var(--faint);font-style:normal;font-size:.9rem;display:block;margin-top:3px}
+
+/* ---------- article ---------- */
+.article{
+  font-family:var(--serif);font-size:1.075rem;line-height:1.78;color:#dfe4ea;
+  max-width:38rem;margin:0 auto;
+}
+.article p{margin:0 0 1.4em}
+.article h3{
+  font-family:var(--ui);font-size:.83rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--accent-2);font-weight:650;margin:2.8em 0 1em;padding-bottom:.6em;
+  border-bottom:1px solid var(--line);
+}
+.article a{color:var(--accent);word-break:break-word}
+.article ul,.article ol{margin:0 0 1.4em;padding-left:1.3em}
+.article li{margin-bottom:.6em}
+.article strong{color:#fff;font-weight:640}
+.article hr{margin:2.4em 0}
+.article blockquote{
+  margin:1.6em 0;padding:14px 20px;border-left:2px solid var(--line);
+  background:var(--elev);color:var(--dim);font-size:.98rem;border-radius:0 8px 8px 0;
+}
+.article blockquote cite{
+  display:block;font-style:normal;font-family:var(--ui);font-size:.78rem;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:8px;
+}
+
+.article pre.ascii{
+  font-family:var(--mono);font-size:.78rem;line-height:1.65;color:#c3cbd6;
+  background:var(--elev);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;overflow-x:auto;margin:1.6em 0;white-space:pre;
+}
+.article pre.ascii a{font-family:inherit}
+
+figure{margin:2.2em 0}
+figure img{border:1px solid var(--line);border-radius:10px;background:#000;margin-inline:auto}
+figure a:hover img{border-color:var(--accent)}
+figcaption{
+  font-family:var(--ui);font-size:.82rem;color:var(--faint);
+  margin-top:10px;line-height:1.5;text-align:center;
+}
+figure.video .video-frame{
+  position:relative;padding-bottom:56.25%;height:0;border:1px solid var(--line);
+  border-radius:10px;overflow:hidden;background:#000;
+}
+figure.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* wide figures break out of the text column */
+@media(min-width:900px){
+  .article figure{margin-left:-90px;margin-right:-90px}
+}
+
+/* ---------- post meta ---------- */
+.postmeta{
+  display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;
+  font-family:var(--ui);font-size:.84rem;color:var(--faint);
+  border:1px solid var(--line);background:var(--elev);border-radius:10px;
+  padding:14px 18px;margin:0 auto 44px;max-width:38rem;
+}
+.postmeta .who{color:var(--text);font-weight:600}
+.postmeta .sep{color:var(--line)}
+
+/* ---------- followups ---------- */
+.followup{max-width:38rem;margin:0 auto 56px;padding-top:8px}
+.followup .fu-head{
+  font-family:var(--ui);font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--faint);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--line);
+}
+.followup .fu-head b{color:var(--accent-2);font-weight:600}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;margin-top:30px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:.9rem;min-width:640px}
+th{
+  text-align:left;font-size:.73rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--faint);font-weight:600;padding:14px 18px;background:var(--elev);
+  border-bottom:1px solid var(--line);
+}
+td{padding:14px 18px;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--dim)}
+tr:last-child td{border-bottom:0}
+td .t{color:var(--text);display:block;margin-bottom:3px}
+td a{word-break:break-all;font-size:.84rem;font-family:var(--mono)}
+.pill{
+  display:inline-block;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:999px;
+  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;
+}
+.pill.ok{background:rgba(74,222,128,.11);color:#6ee7a0;border:1px solid rgba(74,222,128,.26)}
+.pill.dead{background:rgba(255,95,95,.11);color:#ff8f8f;border:1px solid rgba(255,95,95,.26)}
+.pill.rec{background:rgba(110,198,255,.11);color:var(--accent);border:1px solid rgba(110,198,255,.26)}
+.pill.part{background:rgba(251,191,36,.11);color:var(--led-y);border:1px solid rgba(251,191,36,.26)}
+
+/* ---------- cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:30px}
+.card{border:1px solid var(--line);background:var(--elev);border-radius:12px;padding:20px 22px}
+.card h4{margin:0 0 8px;font-size:.95rem;font-weight:640;color:var(--text)}
+.card p{margin:0;font-size:.88rem;color:var(--dim);line-height:1.55}
+.card .mono{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
+
+/* ---------- readme block ---------- */
+pre.readme{
+  font-family:var(--mono);font-size:.8rem;line-height:1.6;color:var(--dim);
+  background:var(--elev);border:1px solid var(--line);border-radius:12px;
+  padding:22px;overflow-x:auto;margin:28px auto 0;max-width:38rem;
+}
+
+/* ---------- footer ---------- */
+footer{padding:64px 0 80px;color:var(--faint);font-size:.9rem}
+footer .wrap{max-width:720px}
+footer p{margin:0 0 14px;line-height:1.7}
+footer strong{color:var(--dim);font-weight:600}
+
+@media(max-width:640px){
+  body{font-size:16px}
+  section{padding:56px 0}
+  header.hero{padding:56px 0 44px}
+  nav .links{display:none}
+  .article{font-size:1.03rem}
+}
+
+@media print{
+  body{background:#fff;color:#111}
+  nav,footer{display:none}
+  section{border:0;padding:24px 0}
+  .article,.lede{color:#111}
+  h1,h2,.article h3,.article strong{color:#000}
+  a{color:#0645ad}
+  figure img{border:1px solid #ccc}
+  .callout,.card,.postmeta,pre.readme{background:#f6f6f6;border:1px solid #ddd}
+  .article figure{margin-left:0;margin-right:0}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <div class="brand">Posi<span>TT</span>ron</div>
+  <div class="links">
+    <a href="#about">About</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#posittron">The 2013 post</a>
+    <a href="#followups">Follow-ups</a>
+    <a href="#suntemple">Sun Temple</a>
+    <a href="#archive">Sources</a>
+  </div>
+  <a class="btn-forum" href="index.html">Full forum threads &#8599;</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="leds"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="eyebrow">Recovered from the dead web &middot; 2013&ndash;2014</div>
+  <h1>Posi<span class="tt">TT</span>ron</h1>
+  <p class="lede">
+    In January 2013, <strong>Jordi Batall&eacute;</strong> built a working 6-DOF positional
+    tracking system for the Oculus Rift out of cardboard, 22&nbsp;LEDs and a PlayStation Eye
+    camera, then wrote up every detail on a forum that has since lost all of its images.
+    This page puts the whole thing back together.
+  </p>
+  <div class="chips">
+    <span class="chip"><b>Jordi Batall&eacute;</b> &middot; PatimPatam</span>
+    <span class="chip">MTBS3D &middot; <b>120 posts</b> over one year</span>
+    <span class="chip"><b>15 images</b> recovered</span>
+    <span class="chip"><b>2 threads</b> restored</span>
+  </div>
+</div></header>
+
+<section id="about"><div class="wrap narrow">
+  <div class="sec-label">What this is</div>
+  <h2>Four links, three of them broken</h2>
+  <p class="sec-intro">
+    This work was published in four places. Today, the original MTBS3D thread is still
+    online but <strong>every single image in it is dead</strong>. They lived on Windows
+    SkyDrive, which stopped serving them. The Oculus forum follow-up is <strong>gone
+    entirely</strong>: the original URL gives nothing, and both of Meta's migrated
+    replacements return 403. Only the Road to VR feature and the Unreal Engine thread
+    still work as intended.
+  </p>
+  <div class="callout">
+    <p>
+      Everything below was rebuilt from Internet Archive snapshots taken while the images
+      were still alive: 21&nbsp;December&nbsp;2013 and 28&nbsp;March&nbsp;2014 for the
+      MTBS3D thread, 19&nbsp;April&nbsp;2015 for the Oculus one.
+    </p>
+    <p>
+      The text is reproduced verbatim, in its original order, with the images and videos
+      back in the positions they were written for. Nothing has been edited, corrected or
+      summarised.
+    </p>
+  </div>
+</div></section>
+
+<section id="timeline"><div class="wrap narrow">
+  <div class="sec-label">Timeline</div>
+  <h2>Two years of it</h2>
+  <p class="sec-intro">The greyed-out entry is context, not part of the work.</p>
+  <ul class="tl"><li><div class="when">8 January 2013</div><div class="what">PosiTTron is posted on the MTBS3D forums<em>A ~5,000 word write-up under &ldquo;VR/AR Research &amp; Development&rdquo;, with build photos, latency measurements, a cost breakdown and two demo videos.</em></div></li><li><div class="when">17 January 2013</div><div class="what">The P3P objection<em>A reader proposes a simpler three-marker layout. The reply explains why three points are geometrically ambiguous, and it is the clearest short explanation of the problem in the whole thread.</em></div></li><li><div class="when">26 January 2013</div><div class="what">Update log: the box filter<em>Swapping a Gaussian blur for a normalised box filter cuts almost 2&nbsp;ms off the frame, taking the pipeline to roughly 8.3&nbsp;ms.</em></div></li><li><div class="when">13 February 2013</div><div class="what">Cardboard templates and 3D printing<em>Plans to release printable templates so anyone could build one from card, with 3D printing as the more expensive option.</em></div></li><li><div class="when">15 February 2013</div><div class="what">Road to VR publishes a five-page feature<em>Ben Lang runs the whole thing as a guest article. It is still online, and is the reason most of the images survived anywhere at all.</em></div></li><li><div class="when">8 January 2014</div><div class="what">The thread ends<em>120 posts from 27 people, one year to the day after it started.</em></div></li><li class="ctx"><div class="when">July 2014</div><div class="what">Oculus ships the DK2<em>Positional tracking by infrared LEDs embedded in the headset, read by a single external camera: the same family of solution, eighteen months later.</em></div></li><li><div class="when">22 December 2014</div><div class="what">Sun Temple MOD: VR navigation experiments<em>A different problem: moving through VR without making people sick. Posted to the Oculus developer forum and to the Unreal Engine forums.</em></div></li></ul>
+</div></section>
+
+<section id="posittron"><div class="wrap">
+  <div class="narrow">
+    <div class="sec-label">Restored &middot; MTBS3D, VR/AR Research &amp; Development</div>
+    <h2>POSITTRON: yet another proposal for positional head-tracking</h2>
+  </div>
+  <div class="postmeta">
+    <span class="who">PatimPatam</span>
+    <span class="sep">|</span>
+    <span>Tue 8 Jan 2013, 1:04&nbsp;am</span>
+    <span class="sep">|</span>
+    <span>last edited Sat 26 Jan 2013</span>
+    <span class="sep">|</span>
+    <span>Barcelona</span>
+  </div>
+  <article class="article"><p>WARNING: If you don't want to read quite a lot I suggest you skip directly to the YouTube videos further down!  </p>
+<h3>INTRO</h3>
+<p>First of all I wanted to mention that i designed this solution mainly with the Oculus Rift in mind, but this concept could be applied to most types of HMDs, that's why i put it under the R&amp;D section.</p>
+<p>I think by now everyone in this forum understands the need for true 6DOF positional tracking so i won't go over it again. I will just stress what Mr Abrash from Valve mentioned at Quakecon: parallax is even more important than stereoscopy for VR/AR. Here's an interesting link:<br><a href="http://cb.nowan.net/blog/2010/04/28/does-stereoscopy-s3d-matter" target="_blank" rel="noopener">http://cb.nowan.net/blog/2010/04/28/does-stereoscopy-s3d-matter</a></p>
+<p>The thing with positional tracking is that there are not only many different approaches to tackle this problem but also many different factors that determine which approach is best fitted in each scenario (seated vs standing play, short vs long distance, occlusion, magnetic interference, complexity of setup/calibration process, usability with backtops, 360 degree freedom of movement, etc). There's already some really good progress by members of this forum on systems designed for specific use cases, like Chriky's fiduciary markers for 1:1 real world location mapping or Brantlew's Red Rovr Motion for redirected movement in open spaces to name a few.</p>
+<p>I however wanted to focus on a completely different use-case, a <strong>consumer-friendly</strong> approach to solve positional tracking for the average gamer playing at home. Here i believe the main priorities should be easy setup, robust seated play without angle restrictions and ideally 360 degree freedom of movement inside a small play area. For me easy setup implies having a maximum of one external tracking device which is easy to position (i.e you don't have to mount on the ceiling), something like the Wii or Kinect for instance. I also believe the overall appearance of the system is really important if you want a successful commercial device.</p>
+<h3>Future and available solutions:</h3>
+<p>Focusing on a consumer-friendly scenario i believe some of the most promising solutions on the long-term are magnetic tracking or PTAM/visual odometry. I think they are both very valid approaches, and probably the future for VR, but we're still not quite there based on what i've seen so far. On the short-term (as in available right now) one of the most popular approaches seems to be "outside-in" optical tracking systems. In general some of the advantages of an external, inward-looking approach are low processing requirements and low latency.</p>
+<p>One example of outside-in optical tracking is the PS Move method, like seen in Project Holodeck (basically strapping 1 PS Move wand on top of the head and use 1 camera for tracking). The problem i have with this type of system (apart from looking quite dorky) is: what happens if you look 90 degrees up? with only 1 camera and 1 marker you will always face occlusion problems..</p>
+<p>Another popular optical solution out there is the TrackIR. This is actually pretty close to what i would want from a tracking system. The only problem with TrackIR is again to do with angles and occlusion: it has a very limited range (about 45 degrees) which is ok if you have your vision fixed on a computer screen but not good enough when wearing a VR headset. Also the working range (about 1.5 meters) is a bit shorter than what i would like (ideally 3 to 4 meters).</p>
+<h3>My approach:</h3>
+<p>So my line of thought was: if we already have a proven technology that when it works it works well, why not simply try to extend it and solve the low-angles and occlusion problems by adding more markers on the target? And while we're at it, why not use one of the big hurdles of VR (having to actually wear a head-mount) in our advantage to integrate the solution?</p>
+<p>A few months back i was following this very interesting topic on 6 DOF head tracking ideas:<br><a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=120&amp;t=15040" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=120&amp;t=15040</a></p>
+<p>After a few posts on this and some other related threads i was quite surprised to find out that apparently no-one in the forum had tried to implement something similar before or given it much thought.. so i decided to give it a try myself as soon as i found some spare time!</p>
+<p>Basically my main design goals were:</p>
+<pre class="ascii">1- Positional tracking (real 6DOF) with 360 degree horizontal and 90 degree vertical freedom
+2- Maximum one external tracking device (camera), easy to setup, no need for user input or calibration
+3- NOT having "protruding antennas" (TrackIR style) or "external glowing balls" (PS move style).
+    Reason A: they make the HMD more break-prone; Reason B: they don't look very cool</pre>
+<p>I think there's a place for a mid-term solution, something which might not be the definite positional tracking for VR but still better than existing alternatives.</p>
+<hr>
+<h3>THE PROPOSED SOLUTION (proof of concept)</h3>
+<h3>The HARDWARE:</h3>
+<p>First of all i would like to present "the truncated cube", in case you don't know him!</p>
+<figure><a href="images/01-truncated-cube-diagram.png" target="_blank" rel="noopener"><img src="images/01-truncated-cube-diagram.png" alt="Diagram of a truncated cube (truncated hexahedron)" width="288" height="300" decoding="async"></a><figcaption>Diagram of a truncated cube (truncated hexahedron)</figcaption></figure>
+<p>The nice thing about the truncated cube is that whatever way you look at it you can always see at least 4 of its faces. For pose estimation of a 3D object you kind of need to see 4 non-coplanar points at all times, so if we were to put markers on each face of a truncated cube this is could be a perfect match for our purpose. Fortunately it doesn't have to be a completely uniform polyhedron, a truncated cuboid also shares this characteristic. Another good thing about this type of polyhedra is that its shape can easily become the base of a HMD shell design.</p>
+<h3>Marker integration</h3>
+<p>The next problem that we have is that for pose estimation we not only need to "see" the markers but we need to be able to identify them, as in put a number to each marker and be able to tell which one is which.</p>
+<p>Infrared (IR) markers are popular because they are very easy to discriminate from the background with proper filters, but being able to detect several colors can help to simplify the problem a lot. Colors on the visible spectrum are obviously harder to detect than IR but we have something that we can use in our advantage: since we are integrating these markers on a HMD we can actually control the background where the colors are displayed to make blob detection easier.</p>
+<p>Here are some of my first experiments, where i decided to use simple color stickers on the darkest background possible. For that i used flocking paper found in telescopes, which is more practical and uniform than using black velvet for instance. Also i think i forgot to mention, i'm using a PS Eye as the main camera for the image processing.</p>
+<figure><a href="images/02-paper-and-foam-mockups.jpg" target="_blank" rel="noopener"><img src="images/02-paper-and-foam-mockups.jpg" alt="Paper mockup of the truncated cube next to the black foam prototype on a cardboard stand" width="500" height="309" decoding="async"></a><figcaption>Paper mockup of the truncated cube next to the black foam prototype on a cardboard stand</figcaption></figure>
+<p>With this setup i managed to get pretty good results; it was good enough to build the main blob analysis algorithm and i was able to discriminate 4 basic colors (r,g,b,y). As expected the problem was that the result was very dependent on ambient light, small changes would make the recognition fail. The obvious next step was moving to color LEDs.</p>
+<p>Looking back finding the right LEDs to use was one of the biggest unexpected difficulties i found; they need to have a wide angle and display uniform light, and i had to test quite a few number with different current intensities and camera settings until i found ones that performed good enough.</p>
+<p>I also found out that i had to reduce the camera gain and exposure almost to the minimum settings possible in order to get correct colors (not white over burn), this in turn helped to reduce blob "trails" in fast movements and also had another good effect: since the whole image is darkened, blob-detection is already half-solved because only bright lights stand out. This actually makes the flocking dark paper quite unnecessary, but i decided to leave it anyway. Here i made a silly mistake though: i made all these tests with the camera running at 30fps instead of 60 and later i realized this really affects the colors detected.</p>
+<p>Here you can see the power source i used and one of the tests i made with LEDs:</p>
+<figure><a href="images/03-power-supply-led-test.jpg" target="_blank" rel="noopener"><img src="images/03-power-supply-led-test.jpg" alt="LED driver power supply wired to a black panel with four LEDs, on a workbench" width="800" height="600" decoding="async"></a><figcaption>LED driver power supply wired to a black panel with four LEDs, on a workbench</figcaption></figure>
+<p>So once i was happy with the LEDs i found it was time to build the main prototype. In theory we need to have only one marker per side of the truncated cuboid (16), this way we always have a minimum 4 non-coplanar points visible (and most of the time redundancy which is not bad). In practice though this cuboid has to be split in 2 parts (front and back of the HMD) so i thought that on the sides and top it would be better to have LEDs on both parts, even if they shared the same theorical plane. This is necessary to overcome occlusion by the head/neck itself.</p>
+<p>Even though it wasn't strictly necessary i decided to use some pilot lights for the front and the back in order to have 2 more different types of markers that would help with the point detection. I also decided to put 2 LEDs on the top and bottom of each part so we could detect at least 4 when looking straight from the top/bottom, without depending on the other part of the HMD. Later i regretted this 2 decisions though, since they complicate the design, the detection algorithm and actually give more problems than benefits..</p>
+<p>Another mistake i made in retrospect was to fix the intensity of the LEDs using voltage regulators LM317 in combination with fixed resistors.. i should have used potentiometers instead, in order to be able to vary the intensity of the LEDs without having to redo any soldering.. oh well..</p>
+<p>Anyway in the end my final design contained 22 individual markers of 6 different types: r, g, b, w, B pilot, Y pilot.</p>
+<p>Obviously in order to detect correctly the 22 different markers it would be ideal if we could have 22 different colors, but that is really not practical and i would dare say not possible, at least with the PS Eye hardware. However having 4 or 6 different types of markers is enough for point detection if you distribute them more or less cleverly and take into account the surrounding markers while trying to identify an individual one. The LEDs don't have to be on the exact positions i used or same colors, you can get creative with this. The only 2 rules are always 4 non-coplanar points visible and colored in a way it's possible to match them with the complete 3d model.</p>
+<p>Some pictures of the building process:</p>
+<figure><a href="images/04-panels-cut-out.jpg" target="_blank" rel="noopener"><img src="images/04-panels-cut-out.jpg" alt="The individual black panels of the truncated-cube shell, cut out and laid flat" width="800" height="600" decoding="async"></a><figcaption>The individual black panels of the truncated-cube shell, cut out and laid flat</figcaption></figure>
+<figure><a href="images/05-leds-soldered.jpg" target="_blank" rel="noopener"><img src="images/05-leds-soldered.jpg" alt="Panels with LEDs and resistors soldered in place, next to a soldering station" width="800" height="600" decoding="async"></a><figcaption>Panels with LEDs and resistors soldered in place, next to a soldering station</figcaption></figure>
+<figure><a href="images/06-wiring-inside.jpg" target="_blank" rel="noopener"><img src="images/06-wiring-inside.jpg" alt="Inside view of the shell being assembled, showing the wiring loom taped to each panel" width="800" height="600" decoding="async"></a><figcaption>Inside view of the shell being assembled, showing the wiring loom taped to each panel</figcaption></figure>
+<p>DIY rough cost estimate:</p>
+<pre class="ascii">-20 LEDs                                 -&gt; 15$
+-2 pilot lights                          -&gt;  8$
+-1 PS camera                          -&gt; 15$
+-LM317Ts, resistors, wires, etc -&gt;  5$ aprox
+
+TOTAL aprox cost                    -&gt; 43$</pre>
+<p>I think if bulk buying the components this could be reduced greatly, probably under 12$ if you don't count the camera cost. If DIYing you may need to add an AC/DC power supply - aprox 15$, which of course is not necessary if it's integrated with the existing HMD supply.</p>
+<p>And here go some images of the finished prototype:</p>
+<figure><a href="images/07-finished-prototype.jpg" target="_blank" rel="noopener"><img src="images/07-finished-prototype.jpg" alt="The finished lit prototype next to the smaller paper reference cube" width="800" height="470" decoding="async"></a><figcaption>The finished lit prototype next to the smaller paper reference cube</figcaption></figure>
+<figure><a href="images/09-prototype-angled-lit.jpg" target="_blank" rel="noopener"><img src="images/09-prototype-angled-lit.jpg" alt="Angled view of the lit prototype showing markers of several colours at once" width="800" height="570" decoding="async"></a><figcaption>Angled view of the lit prototype showing markers of several colours at once</figcaption></figure>
+<h3>The SOFTWARE:</h3>
+<p>For the software side i decided to go with C/C++ since having the lowest possible latency is really important. I also decided to use OpenCV for the image analysis side and OpenGL to show some results. I've never used OpenCV before and i found it very good in general, apart from some outdated documentation in places.</p>
+<p>Brief program explanation:</p>
+<p>Initialization:</p>
+<pre class="ascii">    - Create / store 3D model of markers
+    - Apply gaussian blur to the image to prevent false blobs from being detected</pre>
+<p>Core functionality:</p>
+<pre class="ascii">    - Blob analysis: detect ellipses, obtain center coordinates, color and type
+    - Point detection: Match results of blob analysis with 3d model, numbering each marker
+    - Pose estimation: use the matched 3d model points and 2d image points to estimate the pose of the object</pre>
+<p>Show results:</p>
+<pre class="ascii">    - Apply Kalman filter
+    - Paint results of blob analysis and point detection with OpenCV
+    - Paint simple in-game map with OpenGL</pre>
+<p>To start off i decided to create my own blob detection algorithm in order to have greater control of the conditions and results. I was pleasantly surprised that my custom scanning patterns proved very reliable detecting up to 5 different colors (r, g, b, w, y) under very different light conditions (complete darkness, artificial light and direct sunlight) and up to 1.5m distance approximately; not as good a distance as i would like but I'm quite confident that this could be improved to 2.5 - 3m without too much difficulty. Still, for now it was good enough to move the main focus to other parts of the problem..</p>
+<p>For the point detection i faced the problem of having to identify 22 different markers having only 5 different colors. In order to do that I created quite a big number of fairly complex rules for each marker, that take into account not only the color of the current marker but the relative position and angles of the adjacent ones from all the possible views. This part can still be improved as sometimes the detection fails, but at this point i realized it would be better to rethink a bit the distribution of the LEDs on the hardware before trying to improve the software side.</p>
+<p>For the pose estimation part i decided to use the OpenCV implementation of the POSIT algorithm. Unfortunately is not as simple as calling a function since the input expects the whole list of points of the object you want to detect, starting always with the same origin point, and for each frame we only have a small subset of these (the points visible by the camera). I managed to get around this by using a few tricks, which i won't go into detail for now </p>
+<p>After we have the position and orientation values I thought it would be cool to show a simple real-time representation of a room, so it's easier to evaluate the quality of the output. To do this i created my own OpenGL "engine", so i could have total control of how the combination of inputs affect the movement "in-game". The map i used is a modified by hand version from one of Nehe's OpenGL tutorials: the result is a funky colored temple, with some kind of "tombstones" inside. Head motion detection is exaggerated on purpose for demonstration, should be toned down when using it with a real HMD.</p>
+<figure class="video"><div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/EzC-HDpv2xw" title="PosiTTron: 6 DOF head-tracking prototype for VR - 01" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>PosiTTron: 6 DOF head-tracking prototype for VR - 01 &middot; <a href="https://www.youtube.com/watch?v=EzC-HDpv2xw" target="_blank" rel="noopener">watch on YouTube</a></figcaption></figure>
+<p>Results:</p>
+<p>I think the first results although not perfect are quite promising, as i managed to get a fairly reliable tracking with a good response and good precision, which even at 30 fps feels very fluid. I have tested 60 fps successfully but the blob analysis results are not as good as with 30 fps because the intensity of LEDs is not properly adjusted. This should be fixed with a fairly simple hardware modification.</p>
+<p>In the video the little "wings" that you can see on top and bottom of the prototype were added to simulate the top part of the head and the neck blocking some of the LEDs. You can still see some small glitches from time to time due to the LED detection failing, as i mentioned it could probably be corrected with more complex rules but i have already thought of some modifications in the hardware and marker distribution to prevent it.</p>
+<p>Also most of the jitter you can see (specially with the Kalman filter off) is related to orientation, but this system main purpose is to get positional tracking, so in combination with an IMU for orientation values and leaving the optical tracking to get only the positional information, the final result should be much better. Even though finding orientation was not the main goal of this project, these values are still very usable as you can see on the video.</p>
+<figure class="video"><div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/nsl43qbMnOA" title="PosiTTron: 6 DOF head-tracking prototype for VR - 02" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>PosiTTron: 6 DOF head-tracking prototype for VR - 02 &middot; <a href="https://www.youtube.com/watch?v=nsl43qbMnOA" target="_blank" rel="noopener">watch on YouTube</a></figcaption></figure>
+<p>I don't really know the latency introduced by the PS Eye camera itself but i decided to take some measurements in order to see the latency introduced by my software:</p>
+<pre class="ascii">- normalized box filter blur = 3.38 ms
+- blob analysis = 4.20 ms
+- point detection + pose estimation = 0.06 ms
+- opencv paint results = 0.60 ms
+- opengl paint results = 0.06 ms
+
+TOTAL 8.30 ms aprox</pre>
+<p>First i used OpenCVs Gaussian Blur, but that was taking about 5.20 ms. Later i i realized i could get away replacing it with a Standard Blur (Normalized Box Filter). Blob detection still works great, and latency was reduced by almost 2ms (from 5.20 to 3.38 ms). I believe there's still room for improvement in this area though.</p>
+<p>Recap of current prototype limitations:</p>
+<pre class="ascii">- Blob analysis distance 1.5m. With hardware and software modifications could be improved to 2.5 - 3m
+- Point detections fails sometimes: could be fixed using a different LED distribution
+- 30 fps. 60 fps should be easy to obtain (simply the intensity of LEDs is not properly adjusted). 120 fps possible (at the expense of detection distance due to reduced resolution)</pre>
+<h3>How would a real HMD that uses this system look like?</h3>
+<p>They say a picture is worth a thousand words, so i decided to add a few 3d renders to better show how the idea could be applied to real-life HMDs. Please bear in mind that they are not intended to be very accurate, mechanically correct or even have the right proportions..</p>
+<p>The HMD would have to be separated in 2 different sections, and these could be connected by a telescopic tube for instance, used to maintain rigidness between both parts and to measure the distance between them (in order to feed the tracking algorithm with the exact 3d model). This same information could be useful for other purposes like feeding binaural audio processing with the approximate size of the head.</p>
+<p>Original idea for a full 360 degree positional tracking HMD, on which the cardboard prototype of the pictures and videos is based:</p>
+<figure><a href="images/11-design-a-posittron.jpg" target="_blank" rel="noopener"><img src="images/11-design-a-posittron.jpg" alt="Renders of the full PosiTTron HMD concept with front and rear marker modules" width="1200" height="800" decoding="async"></a><figcaption>Renders of the full PosiTTron HMD concept with front and rear marker modules</figcaption></figure>
+<p>Front and back don't really need to be equal, they simply need to have the markers on fixed positions. I think if this system was applied to a commercial HMD the back part could be used for connectors or to store a wireless receiver and a battery for instance, or simply to counter the weight of the front part and even the center of gravity of the head mount. Maybe following a similar design to some of the 90s Virtuality systems. Also if having a separate back part of the HMD was too much of a problem, the idea could still be used with only the front part, limiting the movement to about 100 degrees in each side (200 total) which would still probably be usable in VR if you keep this limitation in mind while playing.</p>
+<hr>
+<h3>SOME ADDITIONAL THOUGHTS</h3>
+<p>Even though my main priority with this project was seated play, i believe that in combination with a HMD wireless connection and with some improvements on distance detection you could have complete freedom of movement limited to a small area (the FOV of the PS3 camera at a maximum of 3 meters distance approximately). As it is now i think it's good only for seated play, standing/rotating in place could work but you would have to mount the camera on some sort of stand (at head level) and not have much margin to move around.</p>
+<p>As mentioned earlier it's clear that for a consumer device it would be ideal not to have an external tracking device, but i believe having only 1 camera is acceptable, as most people are used to devices like move or Kinect. In fact it could even be seen as a "safety feature": when you walk out of the FOV of the camera the system could pause and warn you. Finally i would like to point out that sometimes we geeks tend to forget that looks is one of the most important aspects for a consumer device. I know as it is now my little prototype doesn't look awesome (and looks are very subjective), but i think it has the potential to look pretty cool. Personally i think it has a Cyclops meets Iron Man kind of vibe </p>
+<p>General Limitations:</p>
+<pre class="ascii">- The main "problem" of this solution is that the case design of the HMD needs to be adapted to it. I want to make clear that this whole idea is not very practical if you want to add positional tracking to an existing HMD (although everything is possible). It is intended to be part of the shell design for a new HMD built with optical tracking in mind (either DIY or commercial).
+
+- Accuracy degrades with distance, still quite good from 1.5 meters. Could be improved.
+
+- If someone walks between you and the camera while playing you can lose positioning. Again maybe this could actually be turned into a good "feature": If someone occludes the camera for more than 3 seconds it could be a way to communicate they need your attention. It would be good to have a method to do this as someone already suggested before:
+<a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=15413</a></pre>
+<h3>Rift developer kit add-on?</h3>
+<p>Here's a possible idea for a Rift developer kit add-on, or as i like to call it "Rift-Hugger" (inspired by the face-huggers from Alien!). The back part could be used to store standard batteries that would power the LEDs.  My guess is that the front plate of the developer kit can be easily removed with the clips on the side. If not the add-on could be simply attached on top of it. The moving parts on the side that hold the Rift could have some sort of locking mechanism as well.</p>
+<figure><a href="images/12-design-b-rift-hugger.jpg" target="_blank" rel="noopener"><img src="images/12-design-b-rift-hugger.jpg" alt="Renders of the Rift-Hugger add-on concept" width="1200" height="800" decoding="async"></a><figcaption>Renders of the Rift-Hugger add-on concept</figcaption></figure>
+<figure><a href="images/13-design-c-rift-and-hugger.jpg" target="_blank" rel="noopener"><img src="images/13-design-c-rift-and-hugger.jpg" alt="Renders of the Rift-Hugger fitted around an existing Oculus Rift" width="1200" height="800" decoding="async"></a><figcaption>Renders of the Rift-Hugger fitted around an existing Oculus Rift</figcaption></figure>
+<p>As you can see, as a separate add-on it wouldn't be ideal, it would have to be targeted to a specific HMD model and it wouldn't be easy to DIY, but it could still be done (and very cheaply in fact if mass-produced in a factory).</p>
+<p>Possible next steps / future improvements:</p>
+<pre class="ascii">- Build another improved prototype: modify LED distribution, separate circuits by colors, use potentiometers instead of resistors, etc.
+
+- Leave orientation to nrp's adjacent reality tracker IMU and use optical only for positioning; unfortunately it's not available yet. Reality tracker should be much more accurate and precise for orientation, play with fusion algorithms.
+
+- Adapt prototype to developer Rift size and shape. As i mentioned before the ideal path would be to design the casing with the optical tracking in mind not the other way around, but after seeing the prototype pictures i think we could do something with it. As it is (without adding a rear part) it would not be possible to have the full 360 deg but i reckon i could get about 240 deg lateral tracking (120 rotation to each side), something still very usable in many scenarios, and a nice step up from TrackIR for instance.
+
+- Increase capture distance by software (adjust color thresholds depending on distance between LEDs).
+
+- Improve blob recognition to allow lower resolution input (120 fps mode).
+
+- Use a cheap graphics card (CUDA) or a FPGA to speed up the image processing?
+
+- Track 2 headsets at the same time 1 with camera?
+
+- Extend system for hand tracking?
+
+- Add FreeTrack support / create a plugin for FreePie / create a new VRPN driver?
+  Still have to look into these options and decide which one should i try first..
+  It would be really cool if I could test the prototype with an existing game that supports 6 DOF, like Arma 2 for instance.</pre>
+<figure><a href="images/08-prototype-front-lit.jpg" target="_blank" rel="noopener"><img src="images/08-prototype-front-lit.jpg" alt="Front view of the prototype in the dark with red, blue and white LEDs lit" width="800" height="570" decoding="async"></a><figcaption>Front view of the prototype in the dark with red, blue and white LEDs lit</figcaption></figure>
+<p>About the POSITTRON name:</p>
+<p>I have to say that i'm not really planning to patent it or anything, i put a name just for fun. I think it suits the project quite well, and sounded better than the boring alternative thread title "HMD optical marker integration".</p>
+<p>The POSIT part is quite obvious, as it's a positional tracking system, and i also happen to use the POSIT algorithm to solve the pose estimation problem. On the TRON side, well TRON is like THE original movie about VR (although not very realistic) and they also happen to use helmets with bright LEDs surrounding them, not too different to my design really! Oh, and I quite like the English band Ladytron </p>
+<hr>
+<h3>TO FINISH OFF (SALES PITCH STUFF)</h3>
+<p>So I know the proposed solution is not the holy grail of tracking, but i believe it's a realistic and ready to go solution that solves some real problems. Let me finish with a list of benefits (box ad style), they are NOT all true with the current prototype version, but could be on a more finalized design:</p>
+<pre class="ascii">- Precise (sub 1mm) positional tracking (6DOF) with 360 degree horizontal and 90 degree vertical freedom of movement. No magnetic interference, no self-occlusion, no drift.
+- Working range from 50cm (in front of a computer) to 3 meters (in front of a TV set/play area). Seated or standing play. Wireless!
+- 120 fps ready, low latency, fast processing (not computationally expensive).
+- Uses open-source software and of-the-shelf available hardware (cheap components).
+- Only one external camera needed which can be placed anywhere in front of the player, no need for calibration.
+- It can look pretty cool, i believe</pre>
+<p>Oh and of course in marketing terms, if this was to be added on top of a 9 DOF tracker like the adjacent reality, i guess it could be called a 15 DOF system:<br>3 DOF accelerometer + 3 DOF gyroscope + 3 DOF magnetometer + 3 DOF optical orientation + 3 DOF optical positioning = 15 DOF!</p>
+<p>I have to say that it has been quite a challenge to find the time to implement all this; i had the idea burning in my head since the end of july more or less, but couldn't start working on it until september. Since then, with a full-time job as web developer, i have been able to spend only a few hours a week on this project..</p>
+<p>Anyway it seems like Oculus are looking into using PTAM for localization/positioning, which i think is the right move in the long term; I really hope they can manage a properly robust and low-latency implementation. Still I think something closer to my design could be a simpler and safe alternative / plan B, in case the PTAM research doesn't pan out in time for the consumer Rift. I also think this design fits quite well with Palmer's approach of "doing more with less".</p>
+<p>Personally i believe this solution would be ideal for the developer version that we will get in about 3 months, as it would let developers start programming and experimenting with positional tracking. Also it would help the Oculus team design the SDK with positioning as a main feature, and to receive feedback from the community. Unfortunately it's probably a bit too late for this to happen on the Kickstarter revision.. who knows, maybe there's still time to add a few holes on the Rift shell as part of the fabrication process heheh.</p>
+<p>In any case i think this could still be useful to developers and DIYers as an alternative to strapping a PS Move, a Razer Hydra or a mobile phone on their heads    I'll be more than happy to help if anyone wants to give it a go. Also of course any good ideas are more than welcome, either from the HW or SW side. I'm sure this particular design and tracking software could be greatly improved but i think my little demo is enough to prove that this is an avenue worth exploring.</p>
+<p>Ok, finished (for now), and sorry for the long ramblings!</p>
+<h3>Acknowledgedments:</h3>
+<p>I would like to thank some members of this forum like Brantlew and Chriky who kindly answered some of my newbie questions when i got started, and specially Edz who gave some good advice when we were discussing all this back in July/August. Last but not least i would like to thank my lovely girlfriend for her craftsmanship input while building the physical prototype and for her constant support in all my crazy endeavors!</p>
+<hr>
+<h3>UPDATE LOG</h3>
+<p>Update 01: (01-26-2013)</p>
+<p>- Replaced Gaussian Blur with a Standard Blur (Normalized Box Filter)<br>- Added 3d model pictures to show how the project could be integrated with an actual head-mount<br>- A few spelling corrections</p></article>
+</div></section>
+
+<section id="followups"><div class="wrap">
+  <div class="narrow">
+    <div class="sec-label">Restored &middot; selected replies</div>
+    <h2>Follow-ups from the thread</h2>
+    <p class="sec-intro">
+      Three later posts from the same thread, kept because each carries an image that
+      exists nowhere else, and because the P3P answer is the best short explanation
+      of why the obvious cheaper design does not work.
+    </p>
+  </div>
+  <div class="followup"><div class="fu-head"><b>PatimPatam</b> &middot; Thu Jan 17, 2013 1:59 pm &middot; post 93912</div><div class="article"><p>Good thinking PasticheDonkey, but here are a few reasons why i believe your approach wouldn't work:</p>
+<p>1- From a pure geometrical perspective, a 2D view (image) of 3 3D points with known relative positions to each other (triad) is not enough to determine the 3D plane which contains them (and therefore position / orientation). This is known as the P3P problem, and there are actually up to 4 different solutions for each possible input. I believe TrackIR can get away with it because they have a very particular distribution of markers, constrained to fairly narrow working angles, that allows them to discard the false positives. The problem is that these properties would be very hard to maintain when you are mixing markers from different triads around the whole 360 degrees.</p>
+<p>As an example you would have this issue when the camera is looking straight to the right side of the HMD, when you would have one green point on the left and 2 red points on the right.</p>
+<figure><a href="images/10-p3p-diagram.jpg" target="_blank" rel="noopener"><img src="images/10-p3p-diagram.jpg" alt="Diagram illustrating the P3P pose-estimation ambiguity problem" width="800" height="474" decoding="async"></a><figcaption>Diagram illustrating the P3P pose-estimation ambiguity problem</figcaption></figure>
+<p>I think 4 triads where you can see at least 1 whole triad from any perspective would be on the limit of being usable, but that makes 12 markers already and you would probably have to use sticking out "antennas" like trackIR does, which i didn't want to do. Maybe in combination with the orientation information from an IMU it could also be possible to filter all the false positives, but so far i based my solution purely from an optical perspective. Apart from that you would still have the following 2 problems.</p>
+<p>2- What happens if you look 90 degrees up? the camera would only see 1 red marker on the left and 1 blue marker on the right, hardly enough to determine position and orientation. Similar thing would happen on the sides and back of the HMD.</p>
+<p>3- The "green" triad at the back could not be attached on a flexible strap. That would make the distance between the front and back triads completely random, and impossible to determine a constant point at the center.</p>
+<p>Having said that i agree that my design could be simplified, as i mentioned on my first post. I think we could easily go from 6 types and 22 total markers to 4 types and 16 total markers, probably less if you add an IMU. These past few days I've been very busy with other things.. i hope this weekend i will have time to finish off some renders which will help understand how this whole idea could be applied in real-life.</p></div></div><div class="followup"><div class="fu-head"><b>PatimPatam</b> &middot; Sun Jan 27, 2013 9:47 pm &middot; post 95701</div><div class="article"><p>Thanks guys!</p>
+<blockquote><cite>Mystify wrote:</cite>Just thinking bout this from a stylistic perspective, but do the lights need to be dots? You just need to detect the blob of color, so the actual device could have a glowing logo or other cool symbol something instead, right?</blockquote>
+<p>The lights don't really need to be dots but they would have to have a simple shape which is easy for the blob detection algorithm to find where it starts and where it ends. Simplifying a bit they couldn't have "holes", so complex symbols like letters wouldn't work very well. But triangles, squares, pentagons etc should be fine. Actually rectangles is a particular case that could be quite interesting.. if you take it to the extreme you could create some cool "paths of light".</p>
+<p>Something like this should work for instance (quick and dirty example!):</p>
+<figure><a href="images/14-concept-render.jpg" target="_blank" rel="noopener"><img src="images/14-concept-render.jpg" alt="Concept render of the tracking HMD worn on a head, seen from the side" width="400" height="400" decoding="async"></a><figcaption>Concept render of the tracking HMD worn on a head, seen from the side</figcaption></figure></div></div><div class="followup"><div class="fu-head"><b>PatimPatam</b> &middot; Wed Feb 13, 2013 9:45 am &middot; post 99624</div><div class="article"><p>Thanks for the suggestions BillRoeske and geekmaster, and sorry about the late reply.. I think this could be a good option, especially vacuum forming looks like could be applicable here (more on that later in this post).</p>
+<p>This last weekend I had a couple ideas as well regarding the HW building process and reducing the cost:</p>
+<p>The first one is that i will probably need to change the initial design i made for the "rift-hugger", so that the main connecting piece between the front and the back sections is not directly supported only by the front part, but by the Oculus dev kit itself. This way the front section will support only it's own weight + LEDs (and maybe some batteries) and it won't have to be so strong and bulky. This will allow a potential 3d print to use less volume and therefore become cheaper, and at the same time open the possibility of using other techniques.</p>
+<p>The other idea is that i will probably give different options for building the HW, so people can choose how much they want to spend / work on it.</p>
+<p>The cheap option is probably going to be the same i used for my first prototype, simply strong cardboard! This will be possible thanks to the change on the design i mentioned. I will release the files with the templates, which people can print on cardboard paper and cut / glue themselves. This of course will be more work than 3d printing, but the main problem with this approach is that it won't be very precise. Because of this there will need to be some sort of calibration process after the main build, but it shouldn't be too complicated and you would need to do it only once.</p>
+<p>The 2nd option will be 3d printing. I have been working on creating some proper STL files, that even if not final have allowed me to get some real quotes, and have a more accurate estimation of the final cost. Here is an example of the front section (17 x 10 x 4 cm bounding box, max thickness = 5 mm, min thickness = 2 mm):</p>
+<figure><a href="images/15-3d-printed-part.jpg" target="_blank" rel="noopener"><img src="images/15-3d-printed-part.jpg" alt="3D model of a printable housing part for the tracker" width="800" height="600" decoding="async"></a><figcaption>3D model of a printable housing part for the tracker</figcaption></figure>
+<p>I have checked on a few 3d printing websites like sculpteo, shapeways or i.materialise.. here is the quote from shapeways for instance, using basic strong white plastic:</p>
+<p>front section<br>104 cm3 - $88</p>
+<p>back section<br>45 cm3 - $47</p>
+<p>total $135, with international shipping included<br>($168 using black plastic instead)</p>
+<p>Still a bit expensive for my liking, but it could be a good option for some people (especially if you have access to a 3d printer!). Also you could try the cheap method to start with and if you're happy with the results order a 3d print for long-time use (all the wiring and LEDs parts should be reusable without having to re-do them).</p>
+<p>Finally i think the option mentioned by BillRoeske of making copies from a master mold is worth considering as well.. i personally don't have the time or equipment to get into this business, but if someone wants to print a 3d master and then make/sell copies using any method (like vacuum forming for example) that produces good results, similar enough to the original, i wouldn't be against it. Pure law of supply and demand! The only thing is that the LED mounting holes would probably need to be made "by hand" afterwards, so it may be necessary to run a calibration process after the assembly, in a similar way to the 1st method using cardboard.</p></div></div>
+</div></section>
+
+<section id="suntemple"><div class="wrap">
+  <div class="narrow">
+    <div class="sec-label">Restored &middot; Oculus developer forum (now offline)</div>
+    <h2>UE4 Sun Temple MOD: VR Navigation Experiments</h2>
+    <p class="sec-intro">
+      Almost two years later, a different problem: how do you move through a virtual
+      environment without making people sick? This post only exists as an Internet Archive
+      capture; all three of its live URLs are now dead or behind a login.
+    </p>
+  </div>
+  <div class="postmeta">
+    <span class="who">PatimPatam</span>
+    <span class="sep">|</span>
+    <span>Mon 22 Dec 2014, 10:32&nbsp;am</span>
+    <span class="sep">|</span>
+    <span>forums.oculus.com &middot; thread 18422</span>
+  </div>
+  <article class="article"><p>.<br>Hello there! I like to write a little too much sometimes, so if you don't have time for reading.. just <strong>TRY THIS!</strong><br><a href="http://www.mediafire.com/download/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip" target="_blank" rel="noopener">http://www.mediafire.com/download/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip</a></p>
+<p>Ok maybe check the "README.txt" first for controls.</p>
+<p><strong>The demo can still be enjoyed even if you don't want to try my alternative navigation methods or don't have a Razer Hydra (just use gamepad thumbsticks).</strong></p>
+<h3>INTRO</h3>
+<p>So apart from my particular obsession with positional tracking and motion controls another thing that i've been very interested in lately is THE VR NAVIGATION PROBLEM.</p>
+<p><strong>I believe letting people navigate VR environments intuitively, without inducing sickness to a significant percentage of them, is going to be crucial for the mainstream success of VR.</strong> Unfortunately i think we are not quite there yet.</p>
+<h3>SIMULATION SICKNESS</h3>
+<p>Even if we get the perfect HMD with ultra-accurate tracking, high refresh rate and 0 latency, simulating the usual game avatar walking or turning by using a gamepad or a mouse will still induce sickness to many people, because of the simple fact that there's still a mismatch between their visual and vestibular system.</p>
+<p>Basically a HMD with a wide FOV can create the illusion of self-motion (vection) while your inner ear is not really detecting any movement, and this creates a conflict. Acceleration is the main problem here not velocity, since constant velocity doesn't really affect our inner ear fluids.</p>
+<p>We know one possible solution is to design experiences where your avatar is not moving or is staying inside a fixed reference point like a cockpit, but i think this new alternate reality begs to be explored without restrictions.</p>
+<h3>NAVIGATION USABILITY</h3>
+<p>Another aspect that i think needs to be improved a lot is navigation usability. It would be ideal if we had a navigation system that could be used even by non-technical people or with no previous gaming experience. Grandmas should be able to enjoy VR in all its glory!</p>
+<p>Personally i don't think traditional controller thumbsticks have a place in the future of VR navigation. Yes they served their purpose in the history of computer games; when Microsoft released Halo in 2001 it was great being able to play a FPS while sitting on your couch, but really, i think having only 2DOF (for each thumbstick) with very limited granularity and precision is far from ideal for VR navigation.</p>
+<p>13 years later we still don't know what the "standard" VR controller is going to look like, but we do know that it's very likely going to involve having 6DOF tracking on each hand (on top of 6DOF tracking for the head). We already have great products that meet these requirements (Oculus DK2 and Razer Hydra), i think it's time to try something different.. So DEATH TO THE THUMBSTICK!! Oh and DEATH TO THE MOUSE TOO!! There!</p>
+<h3>A BIT OF HISTORY</h3>
+<p>There have already been a good number of efforts trying to solve some of these Navigation issues, but as far as i know all of them have some sort of tradeoff.</p>
+<p>- <strong>Time Rifters</strong> seems to make a really good job reducing sim-sickness by having the HUD in a fixed position, giving the user the feeling of being inside a helmet and creating the same effect as cockpit games (where having a reference point reduces vection).</p>
+<p>- The guys at <strong>CloudHead Games</strong> introduced what they called "<strong>Comfort Mode</strong>" for their game "The Gallery" which effectively removed rotational vection by creating incremental steps (of around 30 degrees i believe). This seems to help a lot of people, but many find it quite immersion breaking.</p>
+<p>- <strong>AltspaceVR</strong> introduced an instant-teleport mode which similarly to comfort-mode completely eliminates vection, but in this case for translations instead of rotations. I think it's a really clever system and can be useful in many circumstances, but obviously it feels very different to what most people are used to. I think using it for instance in a game like Skyrim would remove some of the "magic" of exploration.</p>
+<p>- I think the developer of <strong>Lava inc</strong> had a good idea using positional tracking to control the forward acceleration, but unfortunately the sharp turns of the rollercoaster combined with a small wagon with no fixed reference made it a bit sim-sickness inducing, at least for me.</p>
+<p>- <strong>EvilMech Runner</strong> and <strong>AngryBots</strong> (not sure which one was first) implemented quite an original method of navigation also with the help of positional tracking, by detecting the up and down motion of the HMD when walking in place in RL and translating it into forward movement in VR. Some people said that it really helps, but it can lack the control finesse of other methods and be a bit too "active" for some users.</p>
+<p>- <strong>Windlands</strong> is reported to be rather comfortable by quite a few people, i think this is due to the mechanic of turning your head before moving and then going quickly forward. Also the open-landscape nature of the level helps to reduce the amount of vection.</p>
+<p>- There are probably a few more examples worth noting that i don't remember right now, but i'll finish with a quote from <strong>Palmer Luckey</strong> who said after Oculus Connect regarding the vestibular mismatch:</p>
+<blockquote>We have tested countless ideas (locked backgrounds, grids, FOV reduction, blur, head-movement based navigation, etc), but as of yet, there is no universal solution. Everything promising is very situationally dependent, not a silver bullet.<br><br>I'm disappointed that our extensive research has not turned up a universal fix for vection, but it is not for lack of trying.</blockquote>
+<p>Personally i have been thinking about and discussing this issue in a few different places over the last couple years, here are some examples of interesting threads worth a read:</p>
+<p><a href="http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=18694" target="_blank" rel="noopener">http://www.mtbs3d.com/phpBB/viewtopic.php?f=140&amp;t=18694</a><br><a href="https://forums.oculus.com/viewtopic.php?f=37&amp;t=7987" target="_blank" rel="noopener">https://forums.oculus.com/viewtopic.php?f=37&amp;t=7987</a></p>
+<h3>MOTION-BASED NAVIGATION (MBN)</h3>
+<p>So i decided that i wanted to build a little demo to test some of the navigation methods that seemed more promising to me.</p>
+<p>In fact i started by testing some of these methods by modifying the Tuscany demo almost a year ago, but soon i realized that in order to understand if something "felt" right it was essential to have a body inside the game, a more or less decent avatar that you could identify with. So that would take a bit more work than just a quick hack.</p>
+<p>Apart from that i also wanted to have an alternative demo to Tuscany to show VR locomotion to first timers, so i decided to do both things at the same time while learning UE4, and i based my work on the already great<br><strong>UE4 SUN TEMPLE demo</strong> (more about this later).</p>
+<p>I finally have something to show, and after trying a few different things that didn't work out i eventually settled for 1 alternative system for controlling avatar movement (translation) and 3 alternatives for controlling avatar rotation (1 using motion controls and 2 using head-tracking).</p>
+<p>Basically i was inspired by the "1 button thread" in MTBS i mentioned before and i implemented what i named "PositionalMove" + "MotionTurn" on the oculus forum discussion, as well as 2 variations of "HeadStick + TurnButton".</p>
+<p>The main idea is to use only 1 or 2 buttons in combination with other inputs in order to move or turn. The trick is that the buttons only "activate" navigation mode, but to control it you have to use your torso and/or hands. This means that if you want to stop moving or turning you have to return to the original position; this way there is always a smooth and directly controlled motion, without sudden accelerations or decelerations.</p>
+<h3>Head-Based Translation</h3>
+<p>The basic idea for translation is to lean in Real-Life (RL) in the same direction that you want to move in Virtual Reality (VR). The theory is that this helps to reduce the mismatch between acceleration in VR and being idle in RL; we find a middle ground by mimicking the motions we want to do in VR.</p>
+<p>Let me define some terms first:</p>
+<p>S = Stopped<br>V = Velocity<br>A = Acceleration<br>D = Deceleration<br>J = Jerk<br><br>↑ = Increase<br>↓ = Decrease</p>
+<p>Here's an example of the correspondence between leaning forward in RL and moving the character forward in VR:</p>
+<pre class="ascii">RL   --&gt;  VR
+
+S     --&gt;  S        Head/torso is stopped in RL / Avatar stopped in VR
+V↑(A) --&gt;  A↑(Ja)   We start moving (accelerating) head forward / Acceleration increase in VR
+V     --&gt;  A        We continue to move head at constant velocity / Constant acceleration in VR
+v↓(D) --&gt;  A↓(Jd)   We start stopping (decelerating) head motion / Acceleration decrease in VR
+S     --&gt;  V        Head stopped in forward position / Constant velocity in VR</pre>
+<p>So what we are actually doing here is applying in VR the time derivative of the action applied in RL. There is still a mismatch between both, but this mismatch is not so obvious to the brain anymore since there is a correlation between accelerations.</p>
+<p>The implementation sounds quite simple but i had a few challenges, like how to compensate for rotation of the head when you are only interested in translation of your torso (so it's possible to turn your head without moving). Since the SDK simply provides the location of the HMD you have to subtract the changes in translation caused by the rotation of your head to the "Device Position". My solution is not perfect since you have to approximate using a factor that depends on the size of the head, but it's still much better than using no correction at all.</p>
+<h3>Head-Based Rotation (Standard)</h3>
+<p>A similar principle applies when using head-based rotations. Here the rotation of your head in RL affects the rotation of your avatar in VR, however it has some problems that we didn't have with head-based translations.</p>
+<p>I think it works quite well when mainly walking forward and making adjustments to your walking direction, but it's a bit counter-intuitive when for instance you are standing still, you notice something on your side and you want to rotate towards it. In real life you would always keep staring at the object while you are rotating, but here you have to effectively look away in order to be able to turn and then face it again.</p>
+<p>I still left it because maybe some people prefer it over using a thumbstick or find it less nausea-inducing than other options.</p>
+<h3>Head-Based Rotation (Direct)</h3>
+<p>Alternative to the Standard version, here you immediately turn towards the point that you are looking at, so you have to counter the rotation with your head.</p>
+<p>I think it works pretty well because all you have to do is fix your view in the direction that you want to go, and naturally compensate for the avatar rotation until it stops. The problem is that it doesn't follow the correlation between accelerations explained before, so i think it can induce motion sickness more easily; still i believe it could be a decent alternative in absence of motion controls.</p>
+<h3>Hand-Based Rotation</h3>
+<p>This is the last method that i implemented for rotation. Basically you hold a motion controller like the Razer Hydra and use the yaw value of the control in combination with a button press to determine the rotation of the avatar in VR.</p>
+<p>It's really quite similar to using a thumbstick but with the difference that it's much more precise, so you have greater control of the movement and it can provide much smoother transitions. This i believe can help reducing sim-sickness too.</p>
+<h3>1-Button Mode</h3>
+<p>Finally i also implemented what i call 1-Button Mode. If you activate this mode then the same buttons used for rotation will activate head-based translation as well. I think it works especially well with hand-based rotation (Hydras).</p>
+<h3>Control Methods Conclusions</h3>
+<p>All methods of input are enabled at the same time (using different buttons explained on the readme) so you can try different combinations, thumbstick to move and HandBased Rotation to rotate, play with the sensitivity adjustments, etc. You can also try stepping in front instead of leaning, but personally prefer to stay in place.</p>
+<p>For me the best combination by far is <strong>Head-Based Translation + Hand-Based Rotation</strong>, but i left the other options so people could test them. I'm quite certain i will settle for this or a very similar control scheme in the game that i'm working on, but would be honored if other games or apps considered it.</p>
+<p><strong>PROS</strong><br>- Intuitive and easy to learn<br>- It can attenuate simulation sickness<br>- Responsive, precise and smooth (considerably more than using wasd keys or gamepad thumbsticks)<br>- Simplifies hand controls (from 2 thumbsticks to only 1 or 2 buttons), freedom to do other things, ideal in combination with motion controls, motion capture cameras or even pedals<br>- Decoupling of movement and vision -&gt; allows richer interactions<br>- Works both standing and seated</p>
+<p><strong>CONS</strong><br>- Can't turn and do something that involves rotating both hands at the same time<br>- Requires HMD positional tracking and motion controls so not applicable to something like GearVR. Having said that since only rotational tracking of the hands is required i guess something like the DroidGlove could be used instead of the Hydra/Stem/Move:<br> <a href="http://cubic9.com/Devel/OculusRift/DroidGlove_en/" target="_blank" rel="noopener">http://cubic9.com/Devel/OculusRift/DroidGlove_en/</a><br>- Might be a bit biased, but i can't think of any other one right now  </p>
+<h3>RESULTS</h3>
+<p>Personally i don't usually get motion sickness so i'm not the best test subject. I tested with only 3 people apart from me and no sim-sickness reported using hydra motion-controls, one of them experienced a bit of dizziness using standard thumbsticks.</p>
+<p>The only discomfort that was mentioned by one of the users (my brother) was when crashing into a wall, so i would advise please try not to crash into walls when testing, this will create a mismatch. Maybe it could be sold as a feature to increase immersion: you wouldn't crash your head against a wall in Real-Life, don't do it in VR either!</p>
+<p><strong>Unfortunately i don't think i can say that i "solved" the vestibular mismatch issue</strong>, in the end my approach has its own set of tradeoffs like the other methods, but i thought i was worth the effort exploring. <strong>At least it's another option on the list which some people might prefer</strong>, which i believe is a good thing.</p>
+<h3>ABOUT THE SUN TEMPLE MAP</h3>
+<p>Like i mentioned before, i wanted an alternative to Tuscany as an intro to VR and as a possible standing experience with movement. The main problems i found with Tuscany are:</p>
+<p>- No avatar body<br>- Center of rotation when turning seems off<br>- Fairly simple graphics<br>- Stairs, which can induce sim-sickness<br>- Strange bumps on the floor</p>
+<p>So i adapted/modded the UE4 SUN TEMPLE map for VR using the VR Template provided by mitchemmc from the Epic forums. I think it's an awesome map, looks good and runs quite well since it was originally optimized for mobile hardware. Another advantage is that it's quite small with close walls and columns so it has a good amount of vection.</p>
+<p>The only problem with it is that it has 2 different levels and stairs in between, which is not good since this can induce sim-sickness too. I wanted to remove this problem from the equation so i decided to remove the stairs and flatten out the whole map; unfortunately the first hallway was a bit too much work to put at the same level as the rest so it's not accessible at the moment.</p>
+<p>Here are some of the changes i made to the original level:<br>- Flattened map (minus hallway)<br>- Removed a few things for performance<br>- Changed scale / location of some objects that didn't look quite right in VR<br>- Adapted lighting / post-process<br>- Revised collisions<br>- Added ambient sounds<br>- Added avatar from VR template, slightly tweaked (i know animations could be improved a lot)</p>
+<p>So basically i butchered the whole map, apologies to the original designers at Epic!  </p>
+<h3>PERFORMANCE AND OTHER CONSIDERATIONS</h3>
+<ul><li>The demo is compatible with <strong>0.4.2 -&gt; 0.4.4 Oculus runtimes</strong>, although i don't really recommend 0.4.3.</li><li>The best performance for me is with <strong>0.4.2 Direct Mode / Mirroring OFF / AERO OFF</strong> (hmd sp 140).</li><li>I think it's VERY IMPORTANT to tweak the <strong>Screen Percentage</strong> value as best as you can for your machine. It has a big impact in visual fidelity so it should always be the maximum possible that allows you to run at constant 75 fps. You can access it in the menu (start button to enter menu and right trigger to select).<br><br>By default it's 130. If the demo is not running at constant 75 fps try to turn it down until it does. If the demo is running at constant 75 fps try to turn it up until it doesn't and then turn it back down again.</li><li>As always there is a tradeoff, 0.4.4 has awesome <strong>near-0 low latency</strong> but in my case i have to turn down the screen percentage too low for my taste (110), that's why personally i prefer 0.4.2</li><li>If using <strong>0.4.4 Direct Mode -&gt; Turn Aero ON!</strong></li><li>Remember to leave <strong>Razer Hydra on the base</strong> until the demo has started!</li><li>I recommend <strong>playing standing in place</strong> to get a better sense of immersion/presence.</li><li>Try to <strong>avoid crashing into walls</strong> or anything that will suddently stop your avatar as this can easily induce sim-sickness.</li><li><strong>Ambient Sound:</strong> I did a very quick job with this so i recommend to play it at very <strong>low volume</strong> (so you can barely hear your own steps) and without headphones (as it will only help you notice that there is no proper audio spatialization).</li></ul>
+<h3>TO FINISH OFF</h3>
+<p>Please help testing this! I appreciate honest feedback and i'm especially interested in people that experience problems with vection (discomfort moving around in the Tuscany demo for instance).</p>
+<p><strong>Let me know what you think!</strong> Which was your favorite mode or combination? Did you notice improvement in sim-sickness or was it worse than with classic navigation methods? Did you find the new controls intuitive?</p>
+<p>Cheers!</p>
+<p>Special Thanks to skyrimer (MTBS forums), MrGreen (Oculus forums), mitchemmc (UE4 VR Game Template) and getnamo (UE4 Control Plugins).<br><a href="https://forums.unrealengine.com/showthread.php?12874-VR-Game-Template" target="_blank" rel="noopener">https://forums.unrealengine.com/showthread.php?12874-VR-Game-Template</a><br><a href="https://forums.unrealengine.com/showthread.php?3505-Razer-Hydra-Plugin" target="_blank" rel="noopener">https://forums.unrealengine.com/showthread.php?3505-Razer-Hydra-Plugin</a></p>
+<p><strong>EDIT 12-30-2014:</strong> Some minor corrections to improve clarity</p></article>
+  <div class="narrow" style="margin-top:56px">
+    <div class="sec-label">Shipped with the download</div>
+    <h2 style="font-size:1.3rem">README.txt</h2>
+  </div>
+  <pre class="readme">SUN TEMPLE MOD - VR Navigation Experiments
+
+By Jordi Batalle (PatimPatam)
+
+----------------------------------------------------------------------------------------------
+
+
+CONTROLS
+--------
+
+
+LEFT HYDRA
+
+- Reset HMD = Left Start
+
+
+- Activate Head-Based Translation = Button 1 / Button 2 / Shoulder Button
+
+- Classic Move = Left Thumbstick
+
+
+RIGHT HYDRA
+
+- Menu = Right Start
+
+- Interact with menus = Right Trigger
+
+
+- Activate Hand-Based Rotation = Button 1 / Button 2 / Shoulder Button
+
+- Classic Turn = Right Thumbstick
+
+
+
+XBOX GAMEPAD:
+
+- Reset HMD = Back
+
+- Menu = Start
+
+- Interact with menus = Right Trigger
+
+
+- Activate Head-Based Translation = DPAD Up / DPAD Down / Shoulder Button
+
+- Activate Head-Based Rotation (Direct) = Button A / Shoulder Button
+
+- Activate Head-Based Rotation (Standard) = Button X / Button Y
+
+
+- Classic Move = Left Thumbstick
+
+- Classic Turn = Right Thumbstick
+
+
+
+KEYBOARD:
+
+- Reset HMD = R
+
+- Menu = ENTER
+
+- Exit = Esc
+
+
+- Enable 1-Button Mode = 1
+
+- Disable 1-Button Mode = 2
+
+
+- Increase Turn Sensitivity = Page Up
+
+- Decrease Turn Sensitivity = Page Down
+
+- Increase Move Sensitivity = Home
+
+- Decrease Move Sensitivity = End
+
+
+----------------------------------------------------------------------------------------------
+
+
+
+ATTRIBUTION LICENSE
+-------------------
+
+This VR demo uses these sounds from freesound:
+
+
+
+http://creativecommons.org/licenses/by/3.0/
+
+&quot;76188__movingplaid__concrete-step-2.wav&quot; by movingplaid ( https://www.freesound.org/people/movingplaid/ )
+
+&quot;178219__klangstrand__fireplace.wav&quot; by klangstrand ( https://www.freesound.org/people/klangstrand/ )
+
+&quot;47835__tc630__fire2.wav&quot; by tc630 ( https://www.freesound.org/people/tc630/ )
+
+&quot;60507__juskiddink__waves.wav&quot; by juskiddink ( https://www.freesound.org/people/juskiddink/ )
+
+
+
+http://creativecommons.org/licenses/by-nc/3.0/
+
+&quot;144083__bosk1__wind-houling-1.wav&quot; by Bosk1 ( https://www.freesound.org/people/Bosk1/ )</pre>
+</div></section>
+
+<section id="archive"><div class="wrap">
+  <div class="narrow">
+    <div class="sec-label">The archive</div>
+    <h2>Every source, and whether it still works</h2>
+    <p class="sec-intro">
+      Checked on 4 September 2026. Status reflects what the URL actually returned, not
+      what it claims.
+    </p>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Source</th><th>Status</th><th>Notes</th></tr></thead><tbody><tr><td><span class="t">Original thread (MTBS3D)</span><a href="https://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072" target="_blank" rel="noopener">https://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072</a></td><td><span class="pill part">Online, images dead</span></td><td>The thread survives, but every image 404s: they were hosted on Windows SkyDrive, which stopped serving them years ago.</td></tr><tr><td><span class="t">Wayback snapshot, page 1</span><a href="https://web.archive.org/web/20131221025253/http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072" target="_blank" rel="noopener">https://web.archive.org/web/20131221025253/http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072</a></td><td><span class="pill rec">Recovered</span></td><td>Captured 21 Dec 2013, while the images were still live. This is the source of the restoration above.</td></tr><tr><td><span class="t">Wayback snapshot, pages 2 &amp; 3</span><a href="https://web.archive.org/web/20140328114110/http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072&amp;start=40" target="_blank" rel="noopener">https://web.archive.org/web/20140328114110/http://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072&amp;start=40</a></td><td><span class="pill rec">Recovered</span></td><td>Captured 28 Mar 2014. Together with page 1 these cover all 120 posts.</td></tr><tr><td><span class="t">Road to VR feature</span><a href="https://www.roadtovr.com/posittron-diy-oculus-rift-positional-tracking-virtual-reality/" target="_blank" rel="noopener">https://www.roadtovr.com/posittron-diy-oculus-rift-positional-tracking-virtual-reality/</a></td><td><span class="pill ok">Online</span></td><td>Five-page guest article by Ben Lang, 15 Feb 2013. Still serving its images.</td></tr><tr><td><span class="t">YouTube, demo 01</span><a href="https://www.youtube.com/watch?v=EzC-HDpv2xw" target="_blank" rel="noopener">https://www.youtube.com/watch?v=EzC-HDpv2xw</a></td><td><span class="pill ok">Online</span></td><td>Channel: PatimPatamVR.</td></tr><tr><td><span class="t">YouTube, demo 02</span><a href="https://www.youtube.com/watch?v=nsl43qbMnOA" target="_blank" rel="noopener">https://www.youtube.com/watch?v=nsl43qbMnOA</a></td><td><span class="pill ok">Online</span></td><td>Channel: PatimPatamVR.</td></tr><tr><td><span class="t">Sun Temple thread (Oculus forums)</span><a href="https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422" target="_blank" rel="noopener">https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422</a></td><td><span class="pill dead">Gone</span></td><td>The original URL no longer resolves to the thread.</td></tr><tr><td><span class="t">Sun Temple thread (migrated Meta URLs)</span><a href="https://communityforums.atmeta.com/t5/Game-Design/UE4-Sun-Temple-MOD-download-VR-Navigation-Experiments/td-p/272387" target="_blank" rel="noopener">https://communityforums.atmeta.com/t5/Game-Design/UE4-Sun-Temple-MOD-download-VR-Navigation-Experiments/td-p/272387</a></td><td><span class="pill dead">403</span></td><td>Meta migrated the forum twice. Both current URLs return 403 and are unreachable without an account.</td></tr><tr><td><span class="t">Wayback snapshot, Oculus thread</span><a href="https://web.archive.org/web/20150419171040/https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422" target="_blank" rel="noopener">https://web.archive.org/web/20150419171040/https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422</a></td><td><span class="pill rec">Recovered</span></td><td>Captured 19 Apr 2015. All 11 posts, including the full write-up restored above.</td></tr><tr><td><span class="t">Sun Temple thread (Unreal Engine forums)</span><a href="https://forums.unrealengine.com/t/vr-navigation-experiments-sun-temple-mod/17664" target="_blank" rel="noopener">https://forums.unrealengine.com/t/vr-navigation-experiments-sun-temple-mod/17664</a></td><td><span class="pill ok">Online</span></td><td>Survived Epic's forum migration, but it is the short version of the post.</td></tr><tr><td><span class="t">Sun Temple MOD download</span><a href="https://www.mediafire.com/file/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip/file" target="_blank" rel="noopener">https://www.mediafire.com/file/d51dzd5hv3r1mw3/Sun_Temple_VR_MOD.zip/file</a></td><td><span class="pill ok">Online</span></td><td>507&nbsp;MB packaged UE4 build. Still downloadable, on a free file host, eleven years on.</td></tr></tbody></table></div>
+  <div class="narrow" style="margin-top:56px">
+    <div class="sec-label">Also in this repository</div>
+    <h2 style="font-size:1.3rem">Raw material</h2>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <h4>Full thread transcripts</h4>
+      <p><span class="mono">sources/mtbs3d-thread-full.txt</span> holds all 120 posts with
+      author and date. <span class="mono">sources/oculus-thread-full.txt</span> holds all 11.</p>
+    </div>
+    <div class="card">
+      <h4>Original archived HTML</h4>
+      <p><span class="mono">sources/raw-html/</span> holds the four Wayback captures exactly
+      as retrieved, in case anything here needs checking against the source.</p>
+    </div>
+    <div class="card">
+      <h4>Images</h4>
+      <p><span class="mono">images/</span> holds 15 files at original resolution, pulled from
+      the archived SkyDrive URLs before they disappear from the Archive too.</p>
+    </div>
+    <div class="card">
+      <h4>The mod itself</h4>
+      <p>The 507&nbsp;MB build is too large for a repository, but it is still live on
+      MediaFire and a local copy has been kept.</p>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>
+    <strong>All words, images, code and designs on this page are Jordi Batall&eacute;'s</strong>,
+    written between January 2013 and December 2014 and reproduced here unedited. The forum
+    replies quoted belong to their respective authors.
+  </p>
+  <p>
+    Assembled in September 2026 from Internet Archive snapshots, because a broken image and
+    a 403 are all it takes for work like this to quietly stop existing. Three of the four
+    original links had already failed by the time this was put together.
+  </p>
+</div></footer>
+
+</body>
+</html>

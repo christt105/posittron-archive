@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Compose index.html for the PosiTTron archive."""
+"""Compose archive.html for the PosiTTron archive.
+
+This is the curated view (Jordi Batalle's own posts only); index.html, the
+full forum threads, is the main entry point and is produced by
+build_forum_view.py.
+"""
 
 import html
 import site_fragments as S
 
-OUT = "/projects/posittron-archive/index.html"
+OUT = "/projects/posittron-archive/archive.html"
 
 CSS = """
 :root{
@@ -362,7 +367,7 @@ PAGE = """<!DOCTYPE html>
     <a href="#suntemple">Sun Temple</a>
     <a href="#archive">Sources</a>
   </div>
-  <a class="btn-forum" href="forum.html">Full forum threads &#8599;</a>
+  <a class="btn-forum" href="index.html">Full forum threads &#8599;</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">

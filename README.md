@@ -13,10 +13,11 @@ offline or lost their images:
   in moving through VR environments without inducing simulation sickness.
 
 Open `index.html` in any browser. No build step, no dependencies, no JavaScript.
-The "Full forum threads" button links to `forum.html`, a second page reproducing
-both threads in full: all 131 posts from every participant, with every avatar
-and inline image downloaded locally, in case the underlying MTBS3D/Oculus
-threads or their Wayback captures ever disappear.
+It reproduces both threads in full: all 131 posts from every participant, with
+every avatar and inline image downloaded locally, in case the underlying
+MTBS3D/Oculus threads or their Wayback captures ever disappear. `archive.html`
+is a second, curated view with only Jordi's own posts laid out as a single
+article; the "Full forum threads" button on it links back to `index.html`.
 
 ## Why this exists
 
@@ -40,8 +41,8 @@ edited, corrected, condensed or paraphrased.
 ## What is in here
 
 ```
-index.html                          the archive page (Jordi's posts, curated)
-forum.html                          both threads in full, every post and author
+index.html                          both threads in full, every post and author
+archive.html                        a curated view (Jordi's posts only)
 images/                             15 curated images at original resolution
 images/avatars/                     every distinct avatar used across both threads
 images/thread/                      inline images posted by other participants
@@ -70,13 +71,19 @@ It should report `RESULT: no text lost`. The only two deliberate differences it
 allows are phpBB's own `Code: Select all` button label, and long `-----` rules
 that became `<hr>` elements.
 
-`forum.html` is produced separately by `tools/build_forum_view.py`, which
-parses every post in `sources/raw-html/` and downloads each avatar and inline
-image it finds (skipping forum chrome: smilies, rank icons, ads). It's
-idempotent, rerun it after re-fetching a capture:
+`index.html` is produced by `tools/build_forum_view.py`, which parses every
+post in `sources/raw-html/` and downloads each avatar and inline image it
+finds (skipping forum chrome: smilies, rank icons, ads). It's idempotent,
+rerun it after re-fetching a capture:
 
 ```sh
 cd tools && python3 build_forum_view.py
+```
+
+`archive.html` is produced separately by `tools/render_page.py`:
+
+```sh
+cd tools && python3 render_page.py
 ```
 
 Two avatars (`inutile` and `saviornt` on the Oculus thread) have no Wayback
