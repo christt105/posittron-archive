@@ -585,8 +585,8 @@ def main():
 
     mtbs_pages = [
         (os.path.join(RAW, "mtbs3d_2013.html"), "20131221025253", 1),
-        (os.path.join(RAW, "mtbs3d_page2.html"), "20140328113948", 2),
-        (os.path.join(RAW, "mtbs3d_page3.html"), "20140328114110", 3),
+        (os.path.join(RAW, "mtbs3d_page2.html"), "20140328114110", 2),
+        (os.path.join(RAW, "mtbs3d_page3.html"), "20140328113948", 3),
     ]
     mtbs_posts = []
     groups = []
@@ -599,16 +599,29 @@ def main():
     ocu_posts = parse_prosilver(os.path.join(RAW, "oculus_2015.html"), "20150419171040", 1)
     print("oculus_2015.html ->", len(ocu_posts), "posts")
 
+    mtbs_wayback_links = " &middot; ".join(
+        f'<a href="https://web.archive.org/web/{ts}/http://www.mtbs3d.com/phpBB/viewtopic.php'
+        f'?f=138&amp;t=16072{"&amp;start=" + str((n - 1) * 40) if n > 1 else ""}" '
+        f'target="_blank" rel="noopener">page {n}</a>'
+        for _, ts, n in mtbs_pages
+    )
     mtbs_html = render_thread(
         "POSITTRON: yet another proposal for positional head-tracking",
         'MTBS3D forum &middot; started by PatimPatam (Jordi Batallé), 8 Jan 2013 &middot; '
-        '<a href="sources/raw-html/mtbs3d_2013.html" target="_blank" rel="noopener">raw capture</a>',
+        '<a href="https://www.mtbs3d.com/phpBB/viewtopic.php?f=138&amp;t=16072" '
+        'target="_blank" rel="noopener">original thread (online, images dead)</a> &middot; '
+        f'Wayback Machine: {mtbs_wayback_links} &middot; '
+        '<a href="sources/raw-html/mtbs3d_2013.html" target="_blank" rel="noopener">local mirror</a>',
         groups,
     )
     ocu_html = render_thread(
         "VR Navigation Experiments (UE4 Sun Temple MOD)",
         'Oculus VR Forums &middot; started by PatimPatam (Jordi Batallé), 22 Dec 2014 &middot; '
-        '<a href="sources/raw-html/oculus_2015.html" target="_blank" rel="noopener">raw capture</a>',
+        '<a href="https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422" '
+        'target="_blank" rel="noopener">original thread (dead, migrated Meta URLs 403)</a> &middot; '
+        '<a href="https://web.archive.org/web/20150419171040/https://forums.oculus.com/viewtopic.php?f=32&amp;t=18422" '
+        'target="_blank" rel="noopener">Wayback Machine</a> &middot; '
+        '<a href="sources/raw-html/oculus_2015.html" target="_blank" rel="noopener">local mirror</a>',
         [(None, ocu_posts)],
     )
 
